@@ -1,7 +1,9 @@
 import { apiHandler } from "../../utils/apis";
-import context from '../../utils/context'
+import { useContext } from '../../utils/context'
 
 const handler = async function (req, res) {
+    const context = await useContext()
+
     const tablename = req.body.tablename
     const pk = req.body.pk
     const field = req.body.field

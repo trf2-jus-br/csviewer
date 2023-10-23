@@ -5,18 +5,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckToSlot } from '@fortawesome/free-solid-svg-icons'
 import { faBuildingColumns } from '@fortawesome/free-solid-svg-icons'
 import ModalError from './modalError'
-import useSWR, { SWRConfig } from 'swr'
-import Fetcher from '../utils/fetcher'
 // import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 
 export const siteTitle = 'CSViewer';
 
 export default function Layout({ children, errorMessage, setErrorMessage }) {
-    const { data, error, isLoading } = useSWR(`/api/context`, Fetcher.fetcher, { refreshInterval: 2000 });
-    if (error) return <div>falhou em carregar</div>
-    if (isLoading) return <div>carregando...</div>
-    if (data.loading) return <div>inicializando contexto...</div>
-
     return (<>
         <Head>
             <link rel="icon" href="/favicon.ico" />
@@ -41,7 +34,7 @@ export default function Layout({ children, errorMessage, setErrorMessage }) {
                     <div className="navbar-brand d-flex align-items-center">
                         <a href="/">
                             <span className="text-success font-weight-bold" style={{ fontSize: "150%" }}><FontAwesomeIcon icon={faCheckToSlot} /></span></a>&nbsp;&nbsp;
-                        <strong>CSViewer {data.loading}</strong>
+                        <strong>CSViewer</strong>
                     </div>
                 </div>
             </div>

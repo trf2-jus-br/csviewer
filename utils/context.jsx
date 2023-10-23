@@ -1,9 +1,12 @@
 import DB from './db'
 import RV from './rv'
+import getConfig from 'next/config'
+const { serverRuntimeConfig } = getConfig()
 
 // store.setState("loading", "Preparando...");
 
-class Context {
+
+export class Context {
     db = undefined
     rv = undefined
 
@@ -12,6 +15,7 @@ class Context {
 
     constructor() {
         console.log('contruindo context')
+        console.log(JSON.stringify(serverRuntimeConfig.context.tableNames))
     }
 
     setMessage(msg) { message = msg }
@@ -25,10 +29,18 @@ class Context {
         await this.rv.carregar(this.setMessage)
 
         this.loading = false
+
+        console.log('salvando context em serverRuntimeConfig')
+        serverRuntimeConfig.context = this
+        console.log(JSON.stringify(serverRuntimeConfig.context.db.tableNames))
     }
 }
 
-const ctx = new Context()
-ctx.initialize()
-
-export default ctx;
+export async function useContext() {
+    if (!serverRuntimeConfig.context.db) {
+        const ctx = new Context()
+        await ctx.initialize()
+        serverRuntimeConfig.context = ctx
+    }
+    return serverRuntimeConfig.context
+}

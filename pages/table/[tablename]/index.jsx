@@ -2,7 +2,6 @@ import React from 'react'
 import Layout from '../../../components/layout'
 import DbTable from '../../../components/dbtable'
 import DebouncedInput from '../../../components/debouncedInput'
-import context from '../../../utils/context'
 import TextUtils from '../../../utils/text'
 import Serialize from '../../../utils/serialize'
 import Func from '../../../utils/func'
@@ -17,7 +16,11 @@ import {
 } from '@tanstack/react-table'
 import { Table as BTable, Pagination, Form } from 'react-bootstrap'
 
-export function getServerSideProps({ params }) {
+import { useContext } from '../../../utils/context'
+
+export async function getServerSideProps({ params }) {
+  const context = await useContext()
+
   // console.log('TABLE ' + params.tablename)
   // console.log(context.db.tables[params.tablename])
 

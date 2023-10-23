@@ -28,14 +28,35 @@ const RV = class RV {
         fs.writeFileSync(this.dirCache, JSON.stringify(this.data));
     }
 
-    inicializarErro(tablename, pk, field) {
+    inicializarPk(tablename, pk) {
         if (!this.data[tablename]) this.data[tablename] = {}
         if (!this.data[tablename][pk]) this.data[tablename][pk] = {}
+    }
+
+    inicializarErro(tablename, pk, field) {
+        this.inicializarPk(tablename, pk)
         if (!this.data[tablename][pk].erro) this.data[tablename][pk].erro = {}
         if (!this.data[tablename][pk].erro[field]) this.data[tablename][pk].erro[field] = {}
     }
 
+    removerErroVazio(tablename, pk) {
+        const erro = this.data[tablename][pk].erro
+        if (Object.keys(erro).length === 0 && erro.constructor === Object)
+            delete this.data[tablename][pk].erro
+    }
+
+    async aprovar(tablename, pk, record) {
+        console.log('aprovar')
+        console.log(tablename)
+        console.log(pk)
+        console.log(JSON.stringify(record))
+        this.inicializarPk(tablename, pk)
+        this.data[tablename][pk].aprovado = record
+        await this.gravar()
+    }
+
     async acrescentarErro(tablename, pk, field, value, message) {
+        console.log('acrescentando...')
         this.inicializarErro(tablename, pk, field)
         this.data[tablename][pk].erro[field] = { value: value, message: message }
         await this.gravar()
@@ -44,6 +65,7 @@ const RV = class RV {
     async removerErro(tablename, pk, field, value, message) {
         this.inicializarErro(tablename, pk, field)
         delete this.data[tablename][pk].erro[field]
+        removerErroVazio(tablename, pk)
         await this.gravar()
     }
 
@@ -59,13 +81,6 @@ const RV = class RV {
         if (!this.data[tablename][pk].erro) return
         return this.data[tablename][pk].erro[field]
     }
-
-    async aprovar(tablename, pk, field, value, message) {
-        this.inicializarErro(tablename, pk, field)
-        delete this.data[tablename][pk].erro[field]
-        await this.gravar()
-    }
-
 }
 
 export default RV;

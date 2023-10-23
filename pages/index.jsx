@@ -3,11 +3,11 @@ import styles from '../styles/Home.module.css';
 import Button from 'react-bootstrap/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckToSlot } from '@fortawesome/free-solid-svg-icons'
-import context from '../utils/context'
+import { useContext } from '../utils/context'
 
+export async function getServerSideProps({ params }) {
+  const context = await useContext()
 
-
-export function getServerSideProps({ params }) {
   // console.log('CORRENTE')
   // console.log(context.db)
   return {

@@ -5,15 +5,16 @@ import { useContext } from '../../utils/context'
 const handler = async function (req, res) {
     const context = await useContext()
 
-    console.log('Report Error API started')
+    console.log('Approve API started')
     const tablename = req.body.tablename
     const pk = req.body.pk
-    const field = req.body.field
-    const value = req.body.value
+    const record = req.body.record
     const message = req.body.message
 
-    context.rv.acrescentarErro(tablename, pk, field, value, message)
+    console.log('Approve API started2')
+    await context.rv.aprovar(tablename, pk, record, message)
 
+    console.log('Approve API started3')
     res.status(200).json({ status: 'OK' });
 }
 

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Layout from '../../../../components/layout'
 import DbTable from '../../../../components/dbtable'
-import context from '../../../../utils/context'
 import TextUtils from '../../../../utils/text'
 import Serialize from '../../../../utils/serialize'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -21,7 +20,11 @@ import { Form, Row, Button } from 'react-bootstrap'
 import Fetcher from '../../../../utils/fetcher'
 import { useRouter } from 'next/navigation'
 
-export function getServerSideProps({ params }) {
+import { useContext } from '../../../../utils/context'
+
+export async function getServerSideProps({ params }) {
+  const context = await useContext()
+
   const props = {
     API_URL_BROWSER: process.env.API_URL_BROWSER,
     tablename: params.tablename,
@@ -96,7 +99,7 @@ export default function Dashboard(props) {
         message: text,
       }, { setErrorMessage })
       console.log(`fetched`)
-      router.refresh()
+      router.refresh();
     } catch (e) { }
     closeModalReportError()
   }
@@ -110,7 +113,18 @@ export default function Dashboard(props) {
       message: undefined,
     }, { setErrorMessage })
     console.log(`fetched`)
-    router.refresh()
+    router.refresh();
+  }
+
+  const handleApprove = async () => {
+    await Fetcher.post(`${props.API_URL_BROWSER}api/approve`, {
+      tablename: props.tablename,
+      pk: props.pk,
+      record: props.record,
+      message: undefined,
+    }, { setErrorMessage })
+    console.log(`fetched`)
+    router.refresh();
   }
 
   const pkValue = props.pk.split('|')
@@ -124,7 +138,7 @@ export default function Dashboard(props) {
             return (<span>, {TextUtils.humanize(s)}: {pkValue[idx]}</span>)
           })}
         </h3></div>
-        <div className="col col-auto"><Button variant="primary" onClick={props.onOk}>Aprovar</Button></div>
+        <div className="col col-auto"><Button variant="primary" onClick={handleApprove}>Aprovar</Button></div>
       </div>
       <Form>
         <Row>

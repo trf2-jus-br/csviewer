@@ -1,8 +1,17 @@
 import { apiHandler } from "../../utils/apis";
-import context from '../../utils/context'
+import Context from '../../utils/context'
+import getConfig from 'next/config'
+import { useContext } from '../../utils/context'
 
 const handler = async function (req, res) {
-    res.status(200).json({ loading: context.loading, message: context.message });
+    const context = await useContext()
+
+    if (!context.db) {
+        const ctx = new Context()
+        await ctx.initialize()
+        serverRuntimeConfig.context = ctx
+    }
+    res.status(200).json({ loading: serverRuntimeConfig.context.loading, message: serverRuntimeConfig.context.message });
 }
 
 export default apiHandler({
