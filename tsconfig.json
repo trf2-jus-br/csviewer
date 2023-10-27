@@ -22,7 +22,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-, "pages/api/login.jsx"  ],
+, "pages/api/login-siga.jsx"  ],
   "exclude": [
     "node_modules"
   ]
