@@ -4,15 +4,19 @@ export default {
     async post(url, body, params) {
         console.log('no post')
         let errorMsg = undefined
+        let headers = {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json',
+        }
+        if (params && params.headers)
+            headers = { ...headers, ...params.headers }
         try {
             const res = await fetch(`${url}`, {
                 method: 'POST',
                 body: JSON.stringify(body),
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json',
-                }
+                headers
             });
+
             const data = await res.json()
             if (res.status !== 200) {
                 if (data && data.error && data.error.err && typeof data.error.err === 'object' && data.error.err !== null && data.error.err.message) errorMsg = data.error.err.message

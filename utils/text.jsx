@@ -1,15 +1,17 @@
-export default {
-    humanize(str) {
-        if (!str || !(typeof str === 'string')) return str
+export function humanize(str) {
+    if (!str || !(typeof str === 'string')) return str
 
-        str = str.replace(/_sistema_origem_/g, '_')
-        str = str.replace(/^sin_/g, '')
-        str = str.replace(/^dta_/g, 'data_')
+    str = str.replace(/_sistema_origem_/g, '_')
+    str = str.replace(/^sin_/g, '')
+    str = str.replace(/^dta_/g, 'data_')
 
-        var i, frags = str.split('_');
-        for (i = 0; i < frags.length; i++) {
-            frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
-        }
-        return frags.join(' ');
+    var i, frags = str.split('_');
+    for (i = 0; i < frags.length; i++) {
+        frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
     }
+    return frags.join(' ');
+}
+
+export function removeAccents(str) {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 }

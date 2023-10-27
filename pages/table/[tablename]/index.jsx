@@ -33,6 +33,9 @@ export async function getServerSideProps({ params }) {
     table = { meta: { name: '', headers: [] }, data: [] }
   props.table = table
 
+  let review = context.rv.data[params.tablename]
+  props.review = review
+
   return { props: Serialize.removeUndefineds(props) };
 }
 
@@ -42,7 +45,7 @@ export default function Dashboard(props) {
 
   return (
     <Layout>
-      {DbTable(props.table)}
+      {DbTable(props.table, props.review)}
     </Layout>
 )
 

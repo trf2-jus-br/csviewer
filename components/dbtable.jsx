@@ -1,7 +1,9 @@
 import React from 'react'
 import DebouncedInput from './debouncedInput'
-import TextUtils from '../utils/text'
+import { humanize } from '../utils/text'
 import Func from '../utils/func'
+import { consultarStatusPorPk } from '../utils/rv-util'
+
 import {
     flexRender,
     PaginationState,
@@ -13,7 +15,7 @@ import {
 } from '@tanstack/react-table'
 import { Table as BTable, Pagination, Form } from 'react-bootstrap'
 
-export default function DbTable(dbtable) {
+export default function DbTable(dbtable, review) {
 
     const columns = dbtable.meta.headers.map((c, idx) => {
         const col = {
@@ -45,7 +47,7 @@ export default function DbTable(dbtable) {
     return (
         <>
             <div className="row">
-                <div className="col"><h3>{TextUtils.humanize(dbtable.meta.name)}</h3></div>
+                <div className="col"><h3>{humanize(dbtable.meta.name)}</h3></div>
                 <div className="col col-6 col-md-2">
                     <DebouncedInput
                         value={globalFilter ?? ''}
@@ -111,15 +113,18 @@ export default function DbTable(dbtable) {
                     ))}
                 </thead>
                 <tbody>
-                    {table.getRowModel().rows.map(row => (
-                        <tr key={row.id}>
-                            {row.getVisibleCells().map(cell => (
-                                <td key={cell.id}>
-                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </td>
-                            ))}
-                        </tr>
-                    ))}
+                    {table.getRowModel().rows.map(row => {
+                        const pk = Func.pk(dbtable, row.original)
+                        return (
+                            <tr key={row.id} className={'table-' + consultarStatusPorPk(review, pk, row.original)}>
+                                {row.getVisibleCells().map(cell => (
+                                    <td key={cell.id}>
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    </td>
+                                ))}
+                            </tr>
+                        )
+                    })}
                 </tbody>
             </BTable>
         </>

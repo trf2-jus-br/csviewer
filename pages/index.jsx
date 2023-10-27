@@ -1,12 +1,31 @@
 import Head from 'next/head'
-import styles from '../styles/Home.module.css';
-import Button from 'react-bootstrap/Button';
+import styles from '../styles/Home.module.css'
+import Button from 'react-bootstrap/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheckToSlot } from '@fortawesome/free-solid-svg-icons'
+import { faCheckToSlot, faRefresh } from '@fortawesome/free-solid-svg-icons'
 import { useContext } from '../utils/context'
+import { consultarStatusPorPk } from '../utils/rv-util'
+import Func from '../utils/func'
+import React, { useState } from 'react'
+import Fetcher from '../utils/fetcher'
+import { useRouter } from 'next/navigation'
 
 export async function getServerSideProps({ params }) {
   const context = await useContext()
+
+  function consultarStatus(tablename, record) {
+    const tablerv = context.rv.data[tablename]
+    if (!tablerv) return undefined
+    const recordpk = Func.pk(context.db.tables[tablename], record)
+    const status = consultarStatusPorPk(tablerv, recordpk, record)
+    return status
+  }
+
+  function consultarExcluidos(tablename) {
+    const tablerv = context.rv.data[tablename]
+    if (!tablerv) return ''
+    return Object.keys(tablerv).reduce((acc, key) => context.db.tables[tablename].index[key] ? 0 : 1, 0);
+  }
 
   // console.log('CORRENTE')
   // console.log(context.db)
@@ -16,7 +35,12 @@ export async function getServerSideProps({ params }) {
       tables: context.db.tableNames.map((i, idx) => {
         return {
           meta: JSON.parse(JSON.stringify(context.db.tables[i].meta)),
-          rows: context.db.tables[i].data.length
+          rows: context.db.tables[i].data.length,
+          waiting: context.db.tables[i].data.reduce((acc, item) => consultarStatus(i, item) === undefined ? acc + 1 : acc, 0),
+          approved: context.db.tables[i].data.reduce((acc, item) => consultarStatus(i, item) === 'success' ? acc + 1 : acc, 0),
+          reproved: context.db.tables[i].data.reduce((acc, item) => consultarStatus(i, item) === 'danger' ? acc + 1 : acc, 0),
+          altered: context.db.tables[i].data.reduce((acc, item) => consultarStatus(i, item) === 'warning' ? acc + 1 : acc, 0),
+          removed: consultarExcluidos(i)
         }
       })
     },
@@ -25,43 +49,60 @@ export async function getServerSideProps({ params }) {
 
 const tableNameRows = (tables) =>
   tables.map((i, idx) => {
+    const modified = new Date(i.meta.modified)
     return (
       <tr key={i.meta.name}>
         <th style={{ textAlign: 'right' }}>{idx + 1}</th>
         <td><a href={`table/${i.meta.name}`}>{i.meta.name}</a></td>
+        <td style={{ textAlign: 'right' }}>{modified.toLocaleDateString('pt-BR')}</td>
+        <td style={{ textAlign: 'right' }}>{modified.toLocaleTimeString('pt-BR')}</td>
         <td style={{ textAlign: 'right' }}>{i.rows}</td>
-        <td style={{ textAlign: 'right' }}></td>
-        <td style={{ textAlign: 'right' }}></td>
-        <td style={{ textAlign: 'right' }}></td>
-        <td style={{ textAlign: 'right' }}></td>
-        <td style={{ textAlign: 'right' }}></td>
+        <td style={{ textAlign: 'right' }} className={'text-primary' + (i.waiting && !i.reproved && !i.altered && !i.removed ? ' table-primary' : '')}>{i.waiting ? i.waiting : ''}</td>
+        <td style={{ textAlign: 'right' }} className={'text-success' + (i.approved && i.approved === i.rows ? ' table-success' : '')}>{i.approved ? i.approved : ''}</td>
+        <td style={{ textAlign: 'right' }} className={'text-danger' + (i.reproved ? ' table-danger' : '')}>{i.reproved ? i.reproved : ''}</td>
+        <td style={{ textAlign: 'right' }} className={'text-warning' + (i.altered ? ' table-warning' : '')}>{i.altered ? i.altered : ''}</td>
+        <td style={{ textAlign: 'right' }} className={'text-secondary' + (i.removed ? ' table-secondary' : '')}>{i.removed ? i.removed : ''}</td>
       </tr>
     );
   });
 
 export default function Home(props) {
+  const [errorMessage, setErrorMessage] = useState(undefined)
+  const [reloading, setReloading] = useState(false)
+  const router = useRouter()
+
+  const handleReloadContext = async (field) => {
+    setReloading(true)
+    await Fetcher.post(`${props.API_URL_BROWSER}api/reloadContext`, {}, { setErrorMessage })
+    console.log(`fetched`)
+    router.refresh()
+  }
+
   return (
     <div className="container content">
       <div className="px-4 my-3 text-center">
         <h1 className="text-success font-weight-bold" style={{ fontSize: "400%" }}><FontAwesomeIcon icon={faCheckToSlot} /></h1>
         <h1 className="display-5 fw-bold">CSViewer</h1>
-        <div className="col-lg-6 mx-auto">
-          <p className="lead mb-4">CSViewer é um sistema desenvolvido para visualizar os dados que serão exportados para o SERH do Tribunal Regional Federal da 2&ordf; Região.</p>
-        </div>
       </div>
 
-      <h3 className="mb-1">Tabelas</h3>
+      <div className="row">
+        <div className="col"><h3 className="mb-1">Tabelas</h3></div>
+        <div className="col col-auto"><Button variant={reloading ? 'warning' : 'light'} onClick={handleReloadContext}><FontAwesomeIcon icon={faRefresh} /></Button></div>
+      </div>
+
       <table className="table table-sm table-striped">
         <thead>
           <tr>
             <th style={{ textAlign: 'right' }}>#</th>
             <th>Nome</th>
-            <th style={{ textAlign: 'right' }}>Linhas</th>
-            <th style={{ textAlign: 'right' }}>Novas</th>
-            <th style={{ textAlign: 'right' }}>Aprovadas</th>
-            <th style={{ textAlign: 'right' }}>Reprovadas</th>
-            <th style={{ textAlign: 'right' }}>Alteradas</th>
-            <th style={{ textAlign: 'right' }}>Excluídas</th>
+            <th>Data</th>
+            <th>Hora</th>
+            <th style={{ textAlign: 'right' }}>Registros</th>
+            <th style={{ textAlign: 'right' }}>Aguardando</th>
+            <th style={{ textAlign: 'right' }}>Aprovados</th>
+            <th style={{ textAlign: 'right' }}>Reprovados</th>
+            <th style={{ textAlign: 'right' }}>Alterados</th>
+            <th style={{ textAlign: 'right' }}>Excluídos</th>
           </tr>
         </thead>
         <tbody className="table-group-divider">

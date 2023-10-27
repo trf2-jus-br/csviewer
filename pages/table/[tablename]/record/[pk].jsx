@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Layout from '../../../../components/layout'
 import DbTable from '../../../../components/dbtable'
-import TextUtils from '../../../../utils/text'
+import { humanize } from '../../../../utils/text'
 import Serialize from '../../../../utils/serialize'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBug, faBugSlash } from '@fortawesome/free-solid-svg-icons'
@@ -21,6 +21,7 @@ import Fetcher from '../../../../utils/fetcher'
 import { useRouter } from 'next/navigation'
 
 import { useContext } from '../../../../utils/context'
+import { consultarStatus } from '../../../../utils/rv-util'
 
 export async function getServerSideProps({ params }) {
   const context = await useContext()
@@ -117,7 +118,18 @@ export default function Dashboard(props) {
   }
 
   const handleApprove = async () => {
-    await Fetcher.post(`${props.API_URL_BROWSER}api/approve`, {
+    await Fetcher.post(`${props.API_URL_BROWSER}api/addApprove`, {
+      tablename: props.tablename,
+      pk: props.pk,
+      record: props.record,
+      message: undefined,
+    }, { setErrorMessage })
+    console.log(`fetched`)
+    router.back();
+  }
+
+  const handleRemoveApprove = async () => {
+    await Fetcher.post(`${props.API_URL_BROWSER}api/removeApprove`, {
       tablename: props.tablename,
       pk: props.pk,
       record: props.record,
@@ -127,37 +139,75 @@ export default function Dashboard(props) {
     router.refresh();
   }
 
+  const events = (array) => {
+    return (<>
+      <h4>Eventos</h4>
+      <table className="table table-sm table-striped">
+        <thead>
+          <tr>
+            <th style={{ textAlign: 'right' }}>#</th>
+            <th>Data/Hora</th>
+            <th>Responsável</th>
+            <th>Evento</th>
+            <th>Descrição</th>
+          </tr>
+        </thead>
+        <tbody className="table-group-divider">
+          {array.map((i, idx) => {
+            const date = new Date(i.date)
+            return (
+              <tr key={idx}>
+                <th style={{ textAlign: 'right' }}>{idx + 1}</th>
+                <td>{date.toLocaleDateString('pt-BR')} {date.toLocaleTimeString('pt-BR')}</td>
+                <td>{i.user}</td>
+                <td>{i.kind}</td>
+                <td>{i.message}</td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table></>)
+  }
+
   const pkValue = props.pk.split('|')
+  const status = consultarStatus(props.rv, props.record)
+  const statusClass = 'text-' + status
 
   return (
     <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
       <div className="row mb-3">
         <div className="col"><h3>
-          {TextUtils.humanize(props.tablemeta.name)}
+          <span className={statusClass}>{humanize(props.tablemeta.name)}</span>
           {props.tablemeta.pk.map((s, idx) => {
-            return (<span>, {TextUtils.humanize(s)}: {pkValue[idx]}</span>)
+            return (<span className={statusClass}>, {humanize(s)}: {pkValue[idx]}</span>)
           })}
         </h3></div>
-        <div className="col col-auto"><Button variant="primary" onClick={handleApprove}>Aprovar</Button></div>
+        <div className="col col-auto">
+          <Button variant="success" onClick={handleApprove} hidden={status === 'success'}>Aprovar</Button>
+          <Button variant="secondary" onClick={handleRemoveApprove} hidden={status !== 'success'}>Cancelar Aprovação</Button>
+        </div>
       </div>
       <Form>
         <Row>
           {props.tablemeta.headers.map(h => {
-            const erro = props.rv && props.rv.erro ? props.rv.erro[h.name] : undefined
-            //const erro = false
+            const error = props.rv && props.rv.error ? props.rv.error[h.name] : undefined
+            //const error = false
             return (
-              <Form.Group className="mb-3 col col-2" controlId={h.name} key={h.name}>
+              <Form.Group className="mb-3 col col-3" controlId={h.name} key={h.name}>
                 <Form.Label className="mb-0 w-100">
                   <div className="row">
                     <div className="col me-auto">{h.caption}</div>
-                    {erro
+                    {error
                       ? (<div className="col col-auto" style={{ color: 'red' }}><a onClick={() => handleRemoveError(h)}><FontAwesomeIcon icon={faBug} /></a></div>)
                       : (<div className="col col-auto" style={{ color: 'lightgray' }}><a onClick={() => openModalReportError(h)}><FontAwesomeIcon icon={faBugSlash} /></a></div>)
                     }
-
                   </div>
                 </Form.Label>
                 <span className="form-control" dangerouslySetInnerHTML={{ __html: props.record[h.name] ? props.record[h.name] : '&nbsp' }} />
+                {props.rv && props.rv.approved && props.record[h.name] !== props.rv.approved[h.name]
+                  ?
+                  <><Form.Label className="mt-1 mb-0 w-100"><span className="text-warning">Valor Aprovado</span></Form.Label><span className="form-control bg-warning" dangerouslySetInnerHTML={{ __html: props.rv.approved[h.name] ? props.rv.approved[h.name] : '&nbsp' }} /></>
+                  : ''}
               </Form.Group>
             )
           })}
@@ -165,6 +215,8 @@ export default function Dashboard(props) {
       </Form>
 
       {props.related ? props.related.map(t => DbTable(t)) : ''}
+
+      {props.rv && props.rv.event ? events(props.rv.event) : ''}
 
       <ModalText show={showModalReportError} onOk={handleReportError} onCancel={closeModalReportError} title="Reportar Problema" caption="Problema" text={`Descreva o problema encontrado no campo ${selectedField ? selectedField.caption : ''}.`} />
     </Layout >

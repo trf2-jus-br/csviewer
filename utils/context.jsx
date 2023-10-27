@@ -15,7 +15,7 @@ export class Context {
 
     constructor() {
         console.log('contruindo context')
-        console.log(JSON.stringify(serverRuntimeConfig.context.tableNames))
+        // console.log(JSON.stringify(serverRuntimeConfig.context.tableNames))
     }
 
     setMessage(msg) { message = msg }
