@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react';
 import Layout from '../../../components/layout'
 import DbTable from '../../../components/dbtable'
 import DebouncedInput from '../../../components/debouncedInput'
@@ -17,8 +17,11 @@ import {
 import { Table as BTable, Pagination, Form } from 'react-bootstrap'
 
 import { useContext } from '../../../utils/context'
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../../api/auth/[...nextauth]"
 
-export async function getServerSideProps({ params }) {
+export async function getServerSideProps({ req, res, params }) {
+  if (!await getServerSession(req, res, authOptions)) return { redirect: { destination: '/auth/signin', permanent: false } }
   const context = await useContext()
 
   // console.log('TABLE ' + params.tablename)
@@ -41,10 +44,11 @@ export async function getServerSideProps({ params }) {
 
 
 
-export default function Dashboard(props) {
+export default function Table(props) {
+  const [errorMessage, setErrorMessage] = useState(undefined)
 
   return (
-    <Layout>
+    <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
       {DbTable(props.table, props.review)}
     </Layout>
 )

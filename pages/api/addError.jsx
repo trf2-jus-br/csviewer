@@ -12,7 +12,7 @@ const handler = async function (req, res) {
     const value = req.body.value
     const message = req.body.message
 
-    context.rv.addError(tablename, pk, field, value, message)
+    context.rv.addError(req.session, tablename, pk, field, value, message)
 
     res.status(200).json({ status: 'OK' });
 }

@@ -28,8 +28,6 @@ const Signin = ({ providers }) => {
     const email = useRef("");
     const password = useRef("");
     return (
-
-
         <div className="p-5 bg-white md:flex-1">
             <div className="container content">
                 <div className="px-4 my-3 text-center">
@@ -50,6 +48,21 @@ const Signin = ({ providers }) => {
                     </div>
                 </div>
             </div >
+
+            <div className="text-center mt-3">
+                {providers &&
+                    Object.values(providers).map(provider => {
+                        if (provider.name !== "Credentials") {
+                            return (
+                                <div key={provider.name} style={{ marginBottom: 0 }}>
+                                    <a href="#" onClick={() => signIn(provider.id)}>
+                                        <span>Acessar com {' '} {provider.name}</span>
+                                    </a>
+                                </div>
+                            )
+                        }
+                    })}
+            </div>
         </div>
     )
 }

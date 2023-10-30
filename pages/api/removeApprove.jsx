@@ -8,7 +8,7 @@ const handler = async function (req, res) {
     const pk = req.body.pk
     const record = req.body.record
     const message = req.body.message
-    await context.rv.removeApprove(tablename, pk, record, message)
+    await context.rv.removeApprove(req.session, tablename, pk, record, message)
     res.status(200).json({ status: 'OK' });
 }
 

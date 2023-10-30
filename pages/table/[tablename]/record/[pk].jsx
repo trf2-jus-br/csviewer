@@ -23,7 +23,11 @@ import { useRouter } from 'next/navigation'
 import { useContext } from '../../../../utils/context'
 import { consultarStatus } from '../../../../utils/rv-util'
 
-export async function getServerSideProps({ params }) {
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "../../../api/auth/[...nextauth]"
+
+export async function getServerSideProps({ req, res, params }) {
+  if (!await getServerSession(req, res, authOptions)) return { redirect: { destination: '/auth/signin', permanent: false } }
   const context = await useContext()
 
   const props = {
@@ -74,7 +78,7 @@ export async function getServerSideProps({ params }) {
   return { props: Serialize.removeUndefineds(props) };
 }
 
-export default function Dashboard(props) {
+export default function Record(props) {
   const [errorMessage, setErrorMessage] = useState(undefined)
   const [selectedField, setSelectedField] = useState(undefined)
   const [showModalReportError, setShowModalReportError] = useState(false)
@@ -159,7 +163,7 @@ export default function Dashboard(props) {
               <tr key={idx}>
                 <th style={{ textAlign: 'right' }}>{idx + 1}</th>
                 <td>{date.toLocaleDateString('pt-BR')} {date.toLocaleTimeString('pt-BR')}</td>
-                <td>{i.user}</td>
+                <td>{i.username}</td>
                 <td>{i.kind}</td>
                 <td>{i.message}</td>
               </tr>

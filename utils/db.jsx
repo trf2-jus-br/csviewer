@@ -1,8 +1,9 @@
 import { parse } from 'fast-csv'
 import fs from 'fs'
 import { humanize } from '../utils/text'
-import Structure from './structure.ts'
 import Func from './func'
+import buildStructure from './structure.ts'
+
 
 // const parse = require('fast-csv')
 
@@ -11,34 +12,37 @@ function isTabelaBasica(str) {
         if (str.length === 0) {
             return false;
         }
-
+        
         return str.charAt(0).toUpperCase() === str.charAt(0);
     }
     // if (process.env.MODE === 'GAJU') {
-    //     return str.startsWith('Gaju')
-    // }
-    return false;
-}
-
-const DB = class DB {
-
-    cacheEnabled = false
-
-    dir = undefined
-    dirCache = undefined
-    enum_dir = process.env.DIR_ENUMS
-
-    tableNames = []
-
-    tables = {
+        //     return str.startsWith('Gaju')
+        // }
+        return false;
     }
+    
+    const DB = class DB {
+        
+        Structure = undefined
 
+        cacheEnabled = false
+        
+        dir = undefined
+        dirCache = undefined
+        enum_dir = process.env.DIR_ENUMS
+        
+        tableNames = []
+        
+        tables = {
+        }
+    
     constructor(anterior) {
         this.dir = anterior ? process.env.DIR_ANTERIOR : process.env.DIR_CORRENTE
         this.dirCache = `${process.env.DIR_CACHE}/${anterior ? 'anterior' : 'corrente'}.json`
     }
-
+    
     async carregar() {
+        this.Structure = await buildStructure()
         if (this.cacheEnabled && fs.existsSync(this.dirCache)) {
             console.log(`carregando do cache: ${this.dirCache}`)
             const data = JSON.parse(fs.readFileSync(this.dirCache, { encoding: 'utf8', flag: 'r' }))
@@ -47,8 +51,8 @@ const DB = class DB {
             return
         }
 
-        for (let i = 0; i < Structure.length; i++)
-            await this.importar(Structure[i].directory, Structure[i].table, Structure[i].meta)
+        for (let i = 0; i < this.Structure.length; i++)
+            await this.importar(this.Structure[i].directory, this.Structure[i].table, this.Structure[i].meta)
 
         const preprocessarTituloDaTabela = (t) => {
             if (t.startsWith('Tabela Básica') || t.startsWith('Gaju'))

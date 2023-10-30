@@ -12,7 +12,7 @@ const handler = async function (req, res) {
     const message = req.body.message
 
     console.log('Approve API started2')
-    await context.rv.addApprove(tablename, pk, record, message)
+    await context.rv.addApprove(req.session, tablename, pk, record, message)
 
     console.log('Approve API started3')
     res.status(200).json({ status: 'OK' });

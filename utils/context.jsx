@@ -32,7 +32,7 @@ export class Context {
 
         console.log('salvando context em serverRuntimeConfig')
         serverRuntimeConfig.context = this
-        console.log(JSON.stringify(serverRuntimeConfig.context.db.tableNames))
+        // console.log(JSON.stringify(serverRuntimeConfig.context.db.tableNames))
     }
 }
 

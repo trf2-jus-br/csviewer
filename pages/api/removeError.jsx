@@ -10,7 +10,7 @@ const handler = async function (req, res) {
     const value = req.body.value
     const message = req.body.message
 
-    context.rv.removeError(tablename, pk, field, value, message)
+    context.rv.removeError(req.session, tablename, pk, field, value, message)
 
     res.status(200).json({ status: 'OK' });
 }
