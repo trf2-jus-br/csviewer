@@ -3,12 +3,12 @@ import GithubProvider from "next-auth/providers/github"
 import CredentialsProvider from "next-auth/providers/credentials";
 
 export const authOptions = {
-  secret: process.env.NextAuth_SECRET,
+  secret: process.env.CSVIEWER_NEXTAUTH_SECRET,
   // Configure one or more authentication providers
   providers: [
     GithubProvider({
-      clientId: process.env.GITHUB_ID,
-      clientSecret: process.env.GITHUB_SECRET,
+      clientId: process.env.CSVIEWER_GITHUB_ID,
+      clientSecret: process.env.CSVIEWER_GITHUB_SECRET,
     }),
     CredentialsProvider({
       // The name to display on the sign in form (e.g. "Sign in with...")

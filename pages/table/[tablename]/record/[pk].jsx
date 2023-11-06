@@ -31,7 +31,7 @@ export async function getServerSideProps({ req, res, params }) {
   const context = await useContext()
 
   const props = {
-    API_URL_BROWSER: process.env.API_URL_BROWSER,
+    CSVIEWER_API_URL_BROWSER: process.env.CSVIEWER_API_URL_BROWSER,
     tablename: params.tablename,
     tablemeta: { name: '', headers: [] },
     record: {},
@@ -96,7 +96,7 @@ export default function Record(props) {
 
   const handleReportError = async (text) => {
     try {
-      await Fetcher.post(`${props.API_URL_BROWSER}api/addError`, {
+      await Fetcher.post(`${props.CSVIEWER_API_URL_BROWSER}api/addError`, {
         tablename: props.tablename,
         pk: props.pk,
         field: selectedField.name,
@@ -110,7 +110,7 @@ export default function Record(props) {
   }
 
   const handleRemoveError = async (field) => {
-    await Fetcher.post(`${props.API_URL_BROWSER}api/removeError`, {
+    await Fetcher.post(`${props.CSVIEWER_API_URL_BROWSER}api/removeError`, {
       tablename: props.tablename,
       pk: props.pk,
       field: field.name,
@@ -122,7 +122,7 @@ export default function Record(props) {
   }
 
   const handleApprove = async () => {
-    await Fetcher.post(`${props.API_URL_BROWSER}api/addApprove`, {
+    await Fetcher.post(`${props.CSVIEWER_API_URL_BROWSER}api/addApprove`, {
       tablename: props.tablename,
       pk: props.pk,
       record: props.record,
@@ -133,7 +133,7 @@ export default function Record(props) {
   }
 
   const handleRemoveApprove = async () => {
-    await Fetcher.post(`${props.API_URL_BROWSER}api/removeApprove`, {
+    await Fetcher.post(`${props.CSVIEWER_API_URL_BROWSER}api/removeApprove`, {
       tablename: props.tablename,
       pk: props.pk,
       record: props.record,

@@ -14,6 +14,7 @@ export class Context {
     message = undefined
 
     constructor() {
+        // throw "erro"
         console.log('contruindo context')
         // console.log(JSON.stringify(serverRuntimeConfig.context.tableNames))
     }

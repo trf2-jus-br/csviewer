@@ -15,8 +15,8 @@ export function temAlteracao(review, record) {
     const altered = JSON.stringify(approved) !== JSON.stringify(record)
     if (altered) {
         console.log('ALTERED')
-        console.log(JSON.stringify(record))
-        console.log(JSON.stringify(approved))
+        // console.log(JSON.stringify(record))
+        // console.log(JSON.stringify(approved))
     }
     return altered
 }

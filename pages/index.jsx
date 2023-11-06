@@ -35,7 +35,7 @@ export async function getServerSideProps({ req, res, params }) {
 
   return {
     props: {
-      API_URL_BROWSER: process.env.API_URL_BROWSER,
+      CSVIEWER_API_URL_BROWSER: process.env.CSVIEWER_API_URL_BROWSER,
       tables: context.db.tableNames.map((i, idx) => {
         return {
           meta: JSON.parse(JSON.stringify(context.db.tables[i].meta)),
@@ -77,7 +77,7 @@ export default function Home(props) {
 
   const handleReloadContext = async (field) => {
     setReloading(true)
-    await Fetcher.post(`${props.API_URL_BROWSER}api/reloadContext`, {}, { setErrorMessage })
+    await Fetcher.post(`${props.CSVIEWER_API_URL_BROWSER}api/reloadContext`, {}, { setErrorMessage })
     console.log(`fetched`)
     router.refresh()
   }

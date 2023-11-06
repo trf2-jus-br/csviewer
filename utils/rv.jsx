@@ -15,7 +15,7 @@ const RV = class RV {
     }
 
     constructor() {
-        this.dirCache = `${process.env.DIR_CACHE}/review.json`
+        this.dirCache = `${process.env.CSVIEWER_DIR_DATA}/review.json`
     }
     
     async carregar() {
@@ -70,6 +70,9 @@ const RV = class RV {
         if (tableStructure && tableStructure.alsoUpdate) {
             const context = await useContext()
             const alteredPk = removeAccents(record['NOME COMPLETO'])
+            let codigoDaUnidade = undefined
+            if (context.db.tables[tableStructure.alsoUpdate].index[alteredPk])
+                codigoDaUnidade = context.db.tables[tableStructure.alsoUpdate].index[alteredPk]['Código da Unidade']
             console.log(alteredPk)
             const alteredRecord = {
                 "UG": record['UG'].substring(1),
@@ -82,7 +85,7 @@ const RV = class RV {
                 "Competência do Juízo": "Não se aplica",
                 "Fundamentação": record['FUNDAMENTAÇÃO'],
                 "Justificativa": record['JUSTIFICATIVA'] + (record['DESIGNAÇÕES'] ? ", " + record['DESIGNAÇÕES'] : '') + (record['AUSÊNCIAS'] ? ", " + record['AUSÊNCIAS'] : '') + (record['FERIADOS'] ? ", " + record['FERIADOS'] : '') + '.',
-                "Código da Unidade": context.db.tables[tableStructure.alsoUpdate].index[alteredPk]['Código da Unidade']
+                "Código da Unidade": codigoDaUnidade
             }
             await this.addApprove(session, tableStructure.alsoUpdate, alteredPk, alteredRecord, true)
         }

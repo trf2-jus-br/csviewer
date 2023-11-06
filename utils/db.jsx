@@ -8,14 +8,14 @@ import buildStructure from './structure.ts'
 // const parse = require('fast-csv')
 
 function isTabelaBasica(str) {
-    if (process.env.MODE === 'SERH') {
+    if (process.env.CSVIEWER_MODE === 'SERH') {
         if (str.length === 0) {
             return false;
         }
         
         return str.charAt(0).toUpperCase() === str.charAt(0);
     }
-    // if (process.env.MODE === 'GAJU') {
+    // if (process.env.CSVIEWER_MODE === 'JUI') {
         //     return str.startsWith('Gaju')
         // }
         return false;
@@ -37,8 +37,8 @@ function isTabelaBasica(str) {
         }
     
     constructor(anterior) {
-        this.dir = anterior ? process.env.DIR_ANTERIOR : process.env.DIR_CORRENTE
-        this.dirCache = `${process.env.DIR_CACHE}/${anterior ? 'anterior' : 'corrente'}.json`
+        this.dir = process.env.CSVIEWER_DIR_JUI
+        this.dirCache = `${process.env.CSVIEWER_DIR_DATA}/${anterior ? 'anterior' : 'corrente'}.json`
     }
     
     async carregar() {
@@ -111,7 +111,7 @@ function isTabelaBasica(str) {
             this.tables[csv] = table
 
             const addData = row => {
-                if (process.env.MODE === 'SERH') {
+                if (process.env.CSVIEWER_MODE === 'SERH') {
                     this.protegerDadosPessoais(row)
 
                     table.meta.headers.forEach(h => {
