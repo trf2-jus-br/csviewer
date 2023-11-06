@@ -25,7 +25,12 @@ export default async function handler(req, res) {
         console.log(data)
 
         if (!data) {
-            res.status(404).send({ message: 'User does not exit!' })
+            res.status(404).send({ message: 'Usuário inexistente!' })
+            return
+        }
+
+        if (!process.env.CSVIEWER_ALLOWED_USERNAMES.split(',').includes(data.usuario.titularSigla)) {
+            res.status(500).send({ message: 'Usuário não autorizado!' })
             return
         }
 
