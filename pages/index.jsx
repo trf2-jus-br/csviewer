@@ -16,7 +16,7 @@ import { authOptions } from "./api/auth/[...nextauth]"
 
 export async function getServerSideProps({ req, res, params }) {
   if (!await getServerSession(req, res, authOptions)) return { redirect: { destination: '/auth/signin', permanent: false } }
-  
+
   const context = await useContext()
 
   function consultarStatus(tablename, record) {
@@ -84,31 +84,30 @@ export default function Home(props) {
 
   return (
     <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
-      <div className="container-fluid content">
-        <div className="row">
-          <div className="col"><h3 className="mb-1">Tabelas</h3></div>
-          <div className="col col-auto"><Button variant={reloading ? 'warning' : 'light'} onClick={handleReloadContext}><FontAwesomeIcon icon={faRefresh} /></Button></div>
-        </div>
+      <div className="row">
+        <div className="col"><h3 className="mb-1">Tabelas</h3></div>
+        <div className="col col-auto"><Button variant={reloading ? 'warning' : 'light'} onClick={handleReloadContext}><FontAwesomeIcon icon={faRefresh} /></Button></div>
+      </div>
 
-        <table className="table table-sm table-striped">
-          <thead>
-            <tr>
-              <th style={{ textAlign: 'right' }}>#</th>
-              <th>Nome</th>
-              <th>Data</th>
-              <th>Hora</th>
-              <th style={{ textAlign: 'right' }}>Registros</th>
-              <th style={{ textAlign: 'right' }}>Aguardando</th>
-              <th style={{ textAlign: 'right' }}>Aprovados</th>
-              <th style={{ textAlign: 'right' }}>Reprovados</th>
-              <th style={{ textAlign: 'right' }}>Alterados</th>
-              <th style={{ textAlign: 'right' }}>Excluídos</th>
-            </tr>
-          </thead>
-          <tbody className="table-group-divider">
-            {tableNameRows(props.tables)}
-          </tbody>
-        </table>
-      </div ></Layout>
+      <table className="table table-sm table-striped">
+        <thead>
+          <tr>
+            <th style={{ textAlign: 'right' }}>#</th>
+            <th>Nome</th>
+            <th>Data</th>
+            <th>Hora</th>
+            <th style={{ textAlign: 'right' }}>Registros</th>
+            <th style={{ textAlign: 'right' }}>Aguardando</th>
+            <th style={{ textAlign: 'right' }}>Aprovados</th>
+            <th style={{ textAlign: 'right' }}>Reprovados</th>
+            <th style={{ textAlign: 'right' }}>Alterados</th>
+            <th style={{ textAlign: 'right' }}>Excluídos</th>
+          </tr>
+        </thead>
+        <tbody className="table-group-divider">
+          {tableNameRows(props.tables)}
+        </tbody>
+      </table>
+    </Layout>
   )
 }
