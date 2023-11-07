@@ -6,10 +6,10 @@ export const authOptions = {
   secret: process.env.CSVIEWER_NEXTAUTH_SECRET,
   // Configure one or more authentication providers
   providers: [
-    GithubProvider({
-      clientId: process.env.CSVIEWER_GITHUB_ID,
-      clientSecret: process.env.CSVIEWER_GITHUB_SECRET,
-    }),
+    // GithubProvider({
+    //   clientId: process.env.CSVIEWER_GITHUB_ID,
+    //   clientSecret: process.env.CSVIEWER_GITHUB_SECRET,
+    // }),
     CredentialsProvider({
       // The name to display on the sign in form (e.g. "Sign in with...")
       name: "Credentials",
