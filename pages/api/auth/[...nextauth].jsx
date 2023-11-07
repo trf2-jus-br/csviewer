@@ -32,7 +32,7 @@ export const authOptions = {
 
       async authorize(credentials, req) {
         const { email, password } = credentials
-        const res = await fetch("http://localhost:3000/api/login", {
+        const res = await fetch(`${process.env.CSVIEWER_API_URL_BROWSER}api/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
