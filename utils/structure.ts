@@ -110,7 +110,7 @@ export default async function buildStructure() {
         }
     })
 
-    const monthnlz = `${mes.replace(/^0+/,"")}_${ano}`
+    const monthnlz = `${mes.replace(/^0+/, "")}_${ano}`
 
     const csvsSubstituicaoMini = [
         `Substituição ES_Capital_SERRA_Cível_JEF Cível_${monthnlz}`,
@@ -171,26 +171,30 @@ export default async function buildStructure() {
         `Substituição RJ_Varas Federais de Niterói e Baixada Litorânea_São Gonçalo_Varas Federais Mistas_${monthnlz}`,
         `Substituição RJ_Varas Federais de Niterói e Baixada Litorânea_São Pedro da Aldeia_Varas Mistas_${monthnlz}`]
 
-        struc.push(...csvsSubstituicaoMini.map(i => ({
-            table: i,
-            directory: ``,
-            alsoUpdate: ``,
-            meta: {
-                pk: [`NOME COMPLETO`],
-                descr: `NOME COMPLETO`
-            }
-        })))
-    
-        // struc.push({
-        //     table: `Gaju_Folha_${month}`,
-        //     directory: `../gajufolha/`,
-        //     alsoUpdate: ``,
-        //     meta: {
-        //         pk: [`Nome do Magistrado`],
-        //         descr: `Nome do Magistrado`
-        //     }
-        // })
+    struc.push(...csvsSubstituicaoMini.map(i => ({
+        table: i,
+        directory: ``,
+        alsoUpdate: ``,
+        meta: {
+            pk: [`NOME COMPLETO`],
+            descr: `NOME COMPLETO`
+        }
+    })))
 
-        return struc
+    // struc.push({
+    //     table: `Gaju_Folha_${month}`,
+    //     directory: `../gajufolha/`,
+    //     alsoUpdate: ``,
+    //     meta: {
+    //         pk: [`Nome do Magistrado`],
+    //         descr: `Nome do Magistrado`
+    //     }
+    // })
 
+    return {
+        month: mes,
+        year: ano,
+        reviewFilename: `${process.env.CSVIEWER_DIR_DATA}/review_gaju_${mes}_${ano}.json`,
+        tables: struc
+    }
 }

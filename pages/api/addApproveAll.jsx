@@ -7,7 +7,7 @@ const handler = async function (req, res) {
 
     for (let i = 0; i < context.db.tableNames.length; i++) {
         const tablename = context.db.tableNames[i]
-        const tableStructure = this.Structure.find(j => j.table === tablename)
+        const tableStructure = this.structure.tables.find(j => j.table === tablename)
         if (!tableStructure || !tableStructure.alsoUpdate) continue
         const table = context.db.table[tablename]
 

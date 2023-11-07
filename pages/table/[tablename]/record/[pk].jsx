@@ -103,7 +103,7 @@ export default function Record(props) {
         value: props.record[selectedField.name],
         message: text,
       }, { setErrorMessage })
-      console.log(`fetched`)
+      // console.log(`fetched`)
       router.refresh();
     } catch (e) { }
     closeModalReportError()
@@ -117,7 +117,7 @@ export default function Record(props) {
       value: props.record[field.name],
       message: undefined,
     }, { setErrorMessage })
-    console.log(`fetched`)
+    // console.log(`fetched`)
     router.refresh();
   }
 
@@ -128,7 +128,7 @@ export default function Record(props) {
       record: props.record,
       message: undefined,
     }, { setErrorMessage })
-    console.log(`fetched`)
+    // console.log(`fetched`)
     router.back();
   }
 
@@ -139,7 +139,7 @@ export default function Record(props) {
       record: props.record,
       message: undefined,
     }, { setErrorMessage })
-    console.log(`fetched`)
+    // console.log(`fetched`)
     router.refresh();
   }
 

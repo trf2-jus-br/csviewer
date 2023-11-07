@@ -1,5 +1,6 @@
 import DB from './db'
 import RV from './rv'
+import buildStructure from './structure.ts'
 import getConfig from 'next/config'
 const { serverRuntimeConfig } = getConfig()
 
@@ -7,6 +8,7 @@ const { serverRuntimeConfig } = getConfig()
 
 
 export class Context {
+    structure = undefined
     db = undefined
     rv = undefined
 
@@ -22,11 +24,12 @@ export class Context {
     setMessage(msg) { message = msg }
 
     async initialize() {
+        this.structure = await buildStructure()
         if (this.db) return
-        this.db = new DB('CORRENTE')
+        this.db = new DB(this.structure)
         await this.db.carregar(this.setMessage)
 
-        this.rv = new RV()
+        this.rv = new RV(this.structure)
         await this.rv.carregar(this.setMessage)
 
         this.loading = false

@@ -62,7 +62,7 @@ export default function Table(props) {
       }, { setErrorMessage })
     }
     router.back();
-    console.log(`fetched`)
+    // console.log(`fetched`)
   }
 
   const handleRemoveApprove = async () => {
@@ -72,7 +72,7 @@ export default function Table(props) {
       record: props.record,
       message: undefined,
     }, { setErrorMessage })
-    console.log(`fetched`)
+    // console.log(`fetched`)
     router.refresh();
   }
 

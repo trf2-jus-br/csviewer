@@ -48,8 +48,6 @@ const login = async function (req, res) {
     // obtém o login e senha
     const auth = req.headers.authorization;
 
-    console.log('vou logar' + auth)
-
     const usuario = await logarSiga(auth);
 
     // Não enviamos a token do SIGA pro usuário, pois não conseguiríamos validar se o usuário alterou ela.

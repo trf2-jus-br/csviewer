@@ -2,7 +2,6 @@ import { parse } from 'fast-csv'
 import fs from 'fs'
 import { humanize } from '../utils/text'
 import Func from './func'
-import buildStructure from './structure.ts'
 
 
 // const parse = require('fast-csv')
@@ -23,12 +22,12 @@ function isTabelaBasica(str) {
     
     const DB = class DB {
         
-        Structure = undefined
+        structure = undefined
 
         cacheEnabled = false
         
         dir = undefined
-        dirCache = undefined
+        cacheFilename = undefined
         enum_dir = process.env.DIR_ENUMS
         
         tableNames = []
@@ -36,35 +35,35 @@ function isTabelaBasica(str) {
         tables = {
         }
     
-    constructor(anterior) {
+    constructor(structure) {
+        this.structure = structure
         this.dir = process.env.CSVIEWER_DIR_JUI
-        this.dirCache = `${process.env.CSVIEWER_DIR_DATA}/${anterior ? 'anterior' : 'corrente'}.json`
+        this.cacheFilename = `${process.env.CSVIEWER_DIR_DATA}/cache.json`
     }
     
     async carregar() {
-        this.Structure = await buildStructure()
-        if (this.cacheEnabled && fs.existsSync(this.dirCache)) {
-            console.log(`carregando do cache: ${this.dirCache}`)
-            const data = JSON.parse(fs.readFileSync(this.dirCache, { encoding: 'utf8', flag: 'r' }))
+        if (this.cacheEnabled && fs.existsSync(this.cacheFilename)) {
+            console.log(`carregando do cache: ${this.cacheFilename}`)
+            const data = JSON.parse(fs.readFileSync(this.cacheFilename, { encoding: 'utf8', flag: 'r' }))
             this.tableNames = data.tableNames
             this.tables = data.tables
             return
         }
 
-        for (let i = 0; i < this.Structure.length; i++)
-            await this.importar(this.Structure[i].directory, this.Structure[i].table, this.Structure[i].meta)
+        for (let i = 0; i < this.structure.tables.length; i++)
+            await this.importar(this.structure.tables[i].directory, this.structure.tables[i].table, this.structure.tables[i].meta)
 
         const preprocessarTituloDaTabela = (t) => {
             if (t.startsWith('Tabela Básica') || t.startsWith('Gaju'))
-                return 'zzz' + t.substring('Tabela Básica'.length)
+                return 'aaa' + t.substring('Tabela Básica'.length)
             return t
         }
 
         this.tableNames.sort((a, b) => preprocessarTituloDaTabela(a).localeCompare(preprocessarTituloDaTabela(b)))
 
         if (this.cacheEnabled) {
-            console.log('escrevendo em ' + this.dirCache)
-            fs.writeFileSync(this.dirCache, JSON.stringify({ tableNames: this.tableNames, tables: this.tables }));
+            console.log('escrevendo em ' + this.cacheFilename)
+            fs.writeFileSync(this.cacheFilename, JSON.stringify({ tableNames: this.tableNames, tables: this.tables }));
         }
     }
 

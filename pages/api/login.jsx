@@ -7,7 +7,6 @@ export default async function handler(req, res) {
             return
         }
         const body = JSON.parse(JSON.stringify(req.body))
-        console.log(body)
         const auth = 'Basic ' + btoa(body.email.toUpperCase() + ':' + body.password)
         const respLogin = await Fetcher.post('https://siga.jfrj.jus.br/siga/api/v1/autenticar', {}, {
             headers: {
@@ -21,8 +20,6 @@ export default async function handler(req, res) {
                 Authorization: 'Bearer ' + respLogin.token
             }
         })
-
-        console.log(data)
 
         if (!data) {
             res.status(404).send({ message: 'Usuário inexistente!' })

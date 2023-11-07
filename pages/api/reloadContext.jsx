@@ -4,7 +4,7 @@ import getConfig from 'next/config'
 
 const handler = async function (req, res) {
     const { serverRuntimeConfig } = getConfig()
-     const context = await useContext()
+    const context = await useContext()
     const ctx = new Context()
     await ctx.initialize()
     serverRuntimeConfig.context = ctx

@@ -7,29 +7,33 @@ import buildStructure from './structure.ts'
 
 const RV = class RV {
     
-    Structure = undefined
+    structure = undefined
 
-    dirCache = undefined
+    filename = undefined
 
     data = {
     }
 
-    constructor() {
-        this.dirCache = `${process.env.CSVIEWER_DIR_DATA}/review.json`
+    constructor(structure) {
+        // console.log(`Carregando RV ${JSON.stringify(this.structure)}`)
+        this.structure = structure
     }
     
     async carregar() {
-        this.Structure = await buildStructure()
-        if (fs.existsSync(this.dirCache)) {
-            console.log(`carregando review.json: ${this.dirCache}`)
-            this.data = JSON.parse(fs.readFileSync(this.dirCache, { encoding: 'utf8', flag: 'r' }))
+        if (this.structure.reviewFilename)
+            this.filename = this.structure.reviewFilename
+        else
+            this.filename = `${process.env.CSVIEWER_DIR_DATA}/review.json`
+        if (fs.existsSync(this.filename)) {
+            console.log(`carregando review.json: ${this.filename}`)
+            this.data = JSON.parse(fs.readFileSync(this.filename, { encoding: 'utf8', flag: 'r' }))
             return
         }
     }
 
     gravar() {
-        console.log('escrevendo em ' + this.dirCache)
-        fs.writeFileSync(this.dirCache, JSON.stringify(this.data));
+        console.log('escrevendo em ' + this.filename)
+        fs.writeFileSync(this.filename, JSON.stringify(this.data));
     }
 
     inicializarPk(tablename, pk) {
@@ -66,14 +70,14 @@ const RV = class RV {
             delete this.data[tablename][pk].error
         this.addEvent(session, tablename, pk, '', 'Aprovação' + (reflected ? ' (refletido)' : ''))
 
-        const tableStructure = this.Structure.find(i => i.table === tablename)
+        const tableStructure = this.structure.tables.find(i => i.table === tablename)
         if (tableStructure && tableStructure.alsoUpdate) {
             const context = await useContext()
             const alteredPk = removeAccents(record['NOME COMPLETO'])
             let codigoDaUnidade = undefined
             if (context.db.tables[tableStructure.alsoUpdate].index[alteredPk])
                 codigoDaUnidade = context.db.tables[tableStructure.alsoUpdate].index[alteredPk]['Código da Unidade']
-            console.log(alteredPk)
+            // console.log(alteredPk)
             const alteredRecord = {
                 "UG": record['UG'].substring(1),
                 "Nome do Magistrado": alteredPk,
@@ -97,7 +101,7 @@ const RV = class RV {
         delete this.data[tablename][pk].approved
         this.addEvent(session, tablename, pk, '', 'Cancelamento de Aprovação' + (reflected ? ' (refletido)' : ''))
 
-        const tableStructure = this.Structure.find(i => i.table === tablename)
+        const tableStructure = this.structure.tables.find(i => i.table === tablename)
         if (tableStructure && tableStructure.alsoUpdate)
             await this.removeApprove(session, tableStructure.alsoUpdate, removeAccents(pk), record, message, true)
         if (!reflected) await this.gravar()
@@ -110,7 +114,7 @@ const RV = class RV {
             delete this.data[tablename][pk].approved
         this.addEvent(session, tablename, pk, '', 'Registro de Erro' + (reflected ? ' (refletido)' : ''), `${field}: '${value}' - ${message}`)
 
-        const tableStructure = this.Structure.find(i => i.table === tablename)
+        const tableStructure = this.structure.tables.find(i => i.table === tablename)
         if (tableStructure && tableStructure.alsoUpdate)
             await this.addError(session, tableStructure.alsoUpdate, removeAccents(pk), field, value, message, true)
         if (!reflected) await this.gravar()
@@ -122,7 +126,7 @@ const RV = class RV {
         this.removerErroVazio(tablename, pk)
         this.addEvent(session, tablename, pk, '', 'Cancelamento de Erro' + (reflected ? ' (refletido)' : ''), `${field}: '${value}'`)
 
-        const tableStructure = this.Structure.find(i => i.table === tablename)
+        const tableStructure = this.structure.tables.find(i => i.table === tablename)
         if (tableStructure && tableStructure.alsoUpdate)
             await this.removeError(session, tableStructure.alsoUpdate, removeAccents(pk), field, value, message, true)
         if (!reflected) await this.gravar()

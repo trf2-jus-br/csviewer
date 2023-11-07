@@ -2,7 +2,6 @@ export default {
     fetcher: (...args) => fetch(...args).then(res => res.json()),
 
     async post(url, body, params) {
-        console.log('no post')
         let errorMsg = undefined
         let headers = {
             'Access-Control-Allow-Origin': '*',
