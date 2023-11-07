@@ -4,7 +4,7 @@ export default async function buildStructure() {
 
     let ano = '2000'
     let mes = '01'
-    const files = await fs.readdir(process.env.CSVIEWER_DIR_JUI + '/../gajufolha');
+    const files = await fs.readdir(process.env.CSVIEWER_DIR_GAJUFOLHA);
 
     const regex = /^Gaju_Folha_(?<mes>\d\d)_(?<ano>20\d\d)\.csv$/;
 

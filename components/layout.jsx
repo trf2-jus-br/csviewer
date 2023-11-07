@@ -77,7 +77,7 @@ export default function Layout({ children, errorMessage, setErrorMessage }) {
                 : <></>}
 
         <div className="container-fluid mt-t mb-3"><div className="row">
-        <div class="col-auto me-auto"></div>
+        <div className="col-auto me-auto"></div>
             <div className="col-auto"><span style={{color: "lightgrey", borderTop: "1px solid lightgrey"}}>v{version}</span></div>
         </div></div>
         <ModalError show={errorMessage} onOk={() => setErrorMessage(undefined)} onCancel={() => setErrorMessage(undefined)} title="Atenção" text={errorMessage} />
