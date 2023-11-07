@@ -27,7 +27,7 @@ export default async function handler(req, res) {
         }
 
         if (!process.env.CSVIEWER_ALLOWED_USERNAMES.split(',').includes(data.usuario.titularSigla)) {
-            res.status(500).send({ message: 'Usuário não autorizado!' })
+            res.status(403).send({ message: 'Usuário não autorizado!' })
             return
         }
 
