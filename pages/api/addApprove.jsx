@@ -4,8 +4,6 @@ import { useContext } from '../../utils/context'
 
 const handler = async function (req, res) {
     const context = await useContext()
-
-    // console.log('Approve')
     const tablename = req.body.tablename
     const pk = req.body.pk
     const record = req.body.record

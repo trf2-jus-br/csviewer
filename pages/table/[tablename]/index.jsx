@@ -66,13 +66,16 @@ export default function Table(props) {
   }
 
   const handleRemoveApprove = async () => {
-    await Fetcher.post(`${props.CSVIEWER_API_URL_BROWSER}api/removeApprove`, {
-      tablename: props.tablename,
-      pk: props.pk,
-      record: props.record,
-      message: undefined,
-    }, { setErrorMessage })
-    // console.log(`fetched`)
+    console.log(`Vou remover a aprovação ${props.table.data.length}`)
+    for (let i = 0; i<props.table.data.length; i++) {
+      const record = props.table.data[i]
+      await Fetcher.post(`${props.CSVIEWER_API_URL_BROWSER}api/removeApprove`, {
+        tablename: props.tablename,
+        pk: Func.pk(props.table, record),
+        record: record,
+        message: undefined,
+      }, { setErrorMessage })
+    }
     router.refresh();
   }
 
