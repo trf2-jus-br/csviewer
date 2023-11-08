@@ -6,6 +6,7 @@ import { faCheckToSlot } from '@fortawesome/free-solid-svg-icons'
 import { faBuildingColumns } from '@fortawesome/free-solid-svg-icons'
 import ModalError from './modalError'
 // import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
+import { useRouter } from 'next/navigation'
 
 import { useSession, signIn, signOut } from "next-auth/react"
 
@@ -18,6 +19,17 @@ export const siteTitle = 'CSViewer';
 
 export default function Layout({ children, errorMessage, setErrorMessage }) {
     const { data: session } = useSession()
+    const router = useRouter()
+
+
+    const handleSignOut = async () => {
+        const r = await signOut({ redirect: false })
+        if (r.url) {
+            router.replace('/')
+            return
+        }
+        setErrorMessage('Erro: fazendo logout.')
+    }
 
     return (<>
         <Head>
@@ -53,7 +65,7 @@ export default function Layout({ children, errorMessage, setErrorMessage }) {
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         {session
                             ? <li className="nav-item">
-                                <a className="nav-link active" aria-current="page" href="#" onClick={() => signOut()}>{session.user.nome} | Logout</a>
+                                <a className="nav-link active" aria-current="page" href="#" onClick={handleSignOut}>{session.user.nome} | Logout</a>
                             </li>
                             : session === null
                                 ? <li className="nav-item">
@@ -77,8 +89,8 @@ export default function Layout({ children, errorMessage, setErrorMessage }) {
                 : <></>}
 
         <div className="container-fluid mt-t mb-3"><div className="row">
-        <div className="col-auto me-auto"></div>
-            <div className="col-auto"><span style={{color: "lightgrey", borderTop: "1px solid lightgrey"}}>v{version}</span></div>
+            <div className="col-auto me-auto"></div>
+            <div className="col-auto"><span style={{ color: "lightgrey", borderTop: "1px solid lightgrey" }}>v{version}</span></div>
         </div></div>
         <ModalError show={errorMessage} onOk={() => setErrorMessage(undefined)} onCancel={() => setErrorMessage(undefined)} title="Atenção" text={errorMessage} />
     </>

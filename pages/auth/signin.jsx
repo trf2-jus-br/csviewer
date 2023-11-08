@@ -5,6 +5,7 @@ import { faCheckToSlot } from '@fortawesome/free-solid-svg-icons'
 import { Button, Form } from 'react-bootstrap';
 import React, { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import Version from '../../components/version'
 
 export async function getServerSideProps(context) {
     const { req } = context;
@@ -80,6 +81,8 @@ const Signin = ({ providers }) => {
                         }
                     })}
             </div>
+
+            {Version()}
         </div>
     )
 }
