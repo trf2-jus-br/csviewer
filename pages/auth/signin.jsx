@@ -32,7 +32,9 @@ const Signin = ({ providers }) => {
     const router = useRouter()
 
 
-    const handleSignInWithCredentials = async () => {
+    const handleSignInWithCredentials = async (e) => {
+        e.preventDefault();
+        
         const r = await signIn("credentials", {
             email: matricula, password: senha, redirect: false
         })
@@ -58,10 +60,10 @@ const Signin = ({ providers }) => {
                         {errorMessage
                             ? <p className="alert alert-danger">{errorMessage}</p>
                             : <></>}
-                        <form onSubmit={(event) => logar(event)}>
+                        <form onSubmit={(event) => handleSignInWithCredentials(event)}>
                             <Form.Control placeholder='Matricula SIGA' className='mt-2 w-100 text-center' type='input' value={matricula} onChange={e => setMatricula(e.target.value)}></Form.Control>
                             <Form.Control placeholder='Senha SIGA' className='mt-1 w-100 text-center' type='password' value={senha} onChange={e => setSenha(e.target.value)}></Form.Control>
-                            <Button variant="primary" onClick={handleSignInWithCredentials} className="mt-2 w-100">Entrar</Button>
+                            <Button type="submit" variant="primary" className="mt-2 w-100">Entrar</Button>
                         </form>
                     </div>
                 </div>
