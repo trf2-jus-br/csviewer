@@ -55,17 +55,24 @@ const tableNameRows = (tables) =>
   tables.map((i, idx) => {
     const modified = new Date(i.meta.modified)
     return (
-      <tr key={i.meta.name}>
+      <tr key={i.meta.name} className={i.meta.exists ? '' : 'table-danger'}>
         <th style={{ textAlign: 'right' }}>{idx + 1}</th>
-        <td><a href={`table/${i.meta.name}`}>{i.meta.name}</a></td>
-        <td style={{ textAlign: 'right' }}>{modified.toLocaleDateString('pt-BR')}</td>
-        <td style={{ textAlign: 'right' }}>{modified.toLocaleTimeString('pt-BR')}</td>
-        <td style={{ textAlign: 'right' }}>{i.rows}</td>
-        <td style={{ textAlign: 'right' }} className={'text-primary' + (i.waiting && !i.reproved && !i.altered && !i.removed ? ' table-primary' : '')}>{i.waiting ? i.waiting : ''}</td>
-        <td style={{ textAlign: 'right' }} className={'text-success' + (i.approved && i.approved === i.rows ? ' table-success' : '')}>{i.approved ? i.approved : ''}</td>
-        <td style={{ textAlign: 'right' }} className={'text-danger' + (i.reproved ? ' table-danger' : '')}>{i.reproved ? i.reproved : ''}</td>
-        <td style={{ textAlign: 'right' }} className={'text-warning' + (i.altered ? ' table-warning' : '')}>{i.altered ? i.altered : ''}</td>
-        <td style={{ textAlign: 'right' }} className={'text-secondary' + (i.removed ? ' table-secondary' : '')}>{i.removed ? i.removed : ''}</td>
+        {i.meta.exists
+          ? <>
+            <td><a href={`table/${i.meta.name}`}>{i.meta.name}</a></td>
+            <td style={{ textAlign: 'right' }}>{modified.toLocaleDateString('pt-BR')}</td>
+            <td style={{ textAlign: 'right' }}>{modified.toLocaleTimeString('pt-BR')}</td>
+            <td style={{ textAlign: 'right' }}>{i.rows}</td>
+            <td style={{ textAlign: 'right' }} className={'text-primary' + (i.waiting && !i.reproved && !i.altered && !i.removed ? ' table-primary' : '')}>{i.waiting ? i.waiting : ''}</td>
+            <td style={{ textAlign: 'right' }} className={'text-success' + (i.approved && i.approved === i.rows ? ' table-success' : '')}>{i.approved ? i.approved : ''}</td>
+            <td style={{ textAlign: 'right' }} className={'text-danger' + (i.reproved ? ' table-danger' : '')}>{i.reproved ? i.reproved : ''}</td>
+            <td style={{ textAlign: 'right' }} className={'text-warning' + (i.altered ? ' table-warning' : '')}>{i.altered ? i.altered : ''}</td>
+            <td style={{ textAlign: 'right' }} className={'text-secondary' + (i.removed ? ' table-secondary' : '')}>{i.removed ? i.removed : ''}</td>
+          </>
+          : <>
+            <td>{i.meta.name}</td>
+            <td colSpan={8} style={{ textAlign: 'center' }}>Arquivo Não Encontrado</td>
+          </>}
       </tr>
     );
   });

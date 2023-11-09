@@ -103,6 +103,7 @@ function isTabelaBasica(str) {
                     ...meta,
                     name: csv,
                     headers: undefined,
+                    exists: undefined,
                 },
                 index: {},
                 data: []
@@ -137,6 +138,12 @@ function isTabelaBasica(str) {
             }
 
             const filepathname = `${fBasica ? this.enum_dir : this.dir}/${directory}${csv}.csv`
+            const exists = fs.existsSync(filepathname)
+            table.meta.exists = exists
+            if (!exists) {
+                console.log(`Tabela '${csv}' - NÃO ENCONTRADA`)
+                resolve()
+            }
             const stats = fs.statSync(filepathname)
             table.meta.modified = stats.mtime
             table.meta.created = stats.ctime
