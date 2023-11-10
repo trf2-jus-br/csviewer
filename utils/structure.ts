@@ -93,6 +93,7 @@ export default async function buildStructure() {
     const struc = csvsGajuMini.map(i => ({
         table: i,
         directory: ``,
+        concatenate: undefined,
         alsoUpdate: `Gaju_Folha_${month}`,
         meta: {
             pk: [`NOME COMPLETO`],
@@ -103,6 +104,7 @@ export default async function buildStructure() {
     struc.push({
         table: `Gaju_Folha_${month}`,
         directory: `../gajufolha/`,
+        concatenate: undefined,
         alsoUpdate: ``,
         meta: {
             pk: [`Nome do Magistrado`],
@@ -174,22 +176,24 @@ export default async function buildStructure() {
     struc.push(...csvsSubstituicaoMini.map(i => ({
         table: i,
         directory: ``,
-        alsoUpdate: ``,
+        concatenate: undefined,
+        alsoUpdate: `Substituicao_Folha_${month}`,
         meta: {
             pk: [`NOME COMPLETO`],
             descr: `NOME COMPLETO`
         }
     })))
 
-    // struc.push({
-    //     table: `Gaju_Folha_${month}`,
-    //     directory: `../gajufolha/`,
-    //     alsoUpdate: ``,
-    //     meta: {
-    //         pk: [`Nome do Magistrado`],
-    //         descr: `Nome do Magistrado`
-    //     }
-    // })
+    struc.push({
+        table: `Substituicao_Folha_${month}`,
+        directory: process.env.CSVIEWER_DIR_DATA,
+        concatenate: /^Substituição.*$/,
+        alsoUpdate: ``,
+        meta: {
+            pk: [`NOME COMPLETO`],
+            descr: `NOME COMPLETO`
+        }
+    })
 
     return {
         month: mes,

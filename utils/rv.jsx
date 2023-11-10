@@ -6,7 +6,7 @@ import buildStructure from './structure.ts'
 
 
 const RV = class RV {
-    
+
     structure = undefined
 
     filename = undefined
@@ -18,7 +18,7 @@ const RV = class RV {
         // console.log(`Carregando RV ${JSON.stringify(this.structure)}`)
         this.structure = structure
     }
-    
+
     async carregar() {
         if (this.structure.reviewFilename)
             this.filename = this.structure.reviewFilename
@@ -72,26 +72,30 @@ const RV = class RV {
 
         const tableStructure = this.structure.tables.find(i => i.table === tablename)
         if (tableStructure && tableStructure.alsoUpdate) {
-            const context = await useContext()
-            const alteredPk = removeAccents(record['NOME COMPLETO'])
-            let codigoDaUnidade = undefined
-            if (context.db.tables[tableStructure.alsoUpdate].index[alteredPk])
-                codigoDaUnidade = context.db.tables[tableStructure.alsoUpdate].index[alteredPk]['Código da Unidade']
-            // console.log(alteredPk)
-            const alteredRecord = {
-                "UG": record['UG'].substring(1),
-                "Nome do Magistrado": alteredPk,
-                "CPF": record['CPF'],
-                "Cargo": record['JUIZ FEDERAL/JUIZ SUBSTITUTO'],
-                "Período do Exercício Cumulativo": record['DATAS'].replaceAll(' a ', 'a').replaceAll(' e ', ','),
-                "Órgão de Origem": record['ORIGEM'],
-                "Órgão Acumulado": record['VARA/ÓRGÃO JURISD. ACUMULADO'],
-                "Competência do Juízo": "Não se aplica",
-                "Fundamentação": record['FUNDAMENTAÇÃO'],
-                "Justificativa": record['JUSTIFICATIVA'] + (record['DESIGNAÇÕES'] ? ", " + record['DESIGNAÇÕES'] : '') + (record['AUSÊNCIAS'] ? ", " + record['AUSÊNCIAS'] : '') + (record['FERIADOS'] ? ", " + record['FERIADOS'] : '') + '.',
-                "Código da Unidade": codigoDaUnidade
+            if (tableStructure.alsoUpdate.startsWith('Gaju')) {
+                const context = await useContext()
+                const alteredPk = removeAccents(record['NOME COMPLETO'])
+                let codigoDaUnidade = undefined
+                if (context.db.tables[tableStructure.alsoUpdate].index[alteredPk])
+                    codigoDaUnidade = context.db.tables[tableStructure.alsoUpdate].index[alteredPk]['Código da Unidade']
+                // console.log(alteredPk)
+                const alteredRecord = {
+                    "UG": record['UG'].substring(1),
+                    "Nome do Magistrado": alteredPk,
+                    "CPF": record['CPF'],
+                    "Cargo": record['JUIZ FEDERAL/JUIZ SUBSTITUTO'],
+                    "Período do Exercício Cumulativo": record['DATAS'].replaceAll(' a ', 'a').replaceAll(' e ', ','),
+                    "Órgão de Origem": record['ORIGEM'],
+                    "Órgão Acumulado": record['VARA/ÓRGÃO JURISD. ACUMULADO'],
+                    "Competência do Juízo": "Não se aplica",
+                    "Fundamentação": record['FUNDAMENTAÇÃO'],
+                    "Justificativa": record['JUSTIFICATIVA'] + (record['DESIGNAÇÕES'] ? ", " + record['DESIGNAÇÕES'] : '') + (record['AUSÊNCIAS'] ? ", " + record['AUSÊNCIAS'] : '') + (record['FERIADOS'] ? ", " + record['FERIADOS'] : '') + '.',
+                    "Código da Unidade": codigoDaUnidade
+                }
+                await this.addApprove(session, tableStructure.alsoUpdate, alteredPk, alteredRecord, true)
+            } else {
+                await this.addApprove(session, tableStructure.alsoUpdate, pk, record, true)
             }
-            await this.addApprove(session, tableStructure.alsoUpdate, alteredPk, alteredRecord, true)
         }
         if (!reflected) await this.gravar()
     }

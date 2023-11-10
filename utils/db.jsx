@@ -2,7 +2,9 @@ import { parse } from 'fast-csv'
 import fs from 'fs'
 import { humanize } from '../utils/text'
 import Func from './func'
-
+import { format } from '@fast-csv/format'
+import iconv from 'iconv-lite'
+import { Transform } from 'stream'
 
 // const parse = require('fast-csv')
 
@@ -11,36 +13,36 @@ function isTabelaBasica(str) {
         if (str.length === 0) {
             return false;
         }
-        
+
         return str.charAt(0).toUpperCase() === str.charAt(0);
     }
     // if (process.env.CSVIEWER_MODE === 'JUI') {
-        //     return str.startsWith('Gaju')
-        // }
-        return false;
-    }
-    
-    const DB = class DB {
-        
-        structure = undefined
+    //     return str.startsWith('Gaju')
+    // }
+    return false;
+}
 
-        cacheEnabled = false
-        
-        dir = undefined
-        cacheFilename = undefined
-        enum_dir = process.env.DIR_ENUMS
-        
-        tableNames = []
-        
-        tables = {
-        }
-    
+const DB = class DB {
+
+    structure = undefined
+
+    cacheEnabled = false
+
+    dir = undefined
+    cacheFilename = undefined
+    enum_dir = process.env.DIR_ENUMS
+
+    tableNames = []
+
+    tables = {
+    }
+
     constructor(structure) {
         this.structure = structure
         this.dir = process.env.CSVIEWER_DIR_JUI
         this.cacheFilename = `${process.env.CSVIEWER_DIR_DATA}/cache.json`
     }
-    
+
     async carregar() {
         if (this.cacheEnabled && fs.existsSync(this.cacheFilename)) {
             console.log(`carregando do cache: ${this.cacheFilename}`)
@@ -50,11 +52,15 @@ function isTabelaBasica(str) {
             return
         }
 
-        for (let i = 0; i < this.structure.tables.length; i++)
-            await this.importar(this.structure.tables[i].directory, this.structure.tables[i].table, this.structure.tables[i].meta)
+        for (let i = 0; i < this.structure.tables.length; i++) {
+            const tablestru = this.structure.tables[i]
+            if (tablestru.concatenate)
+                await this.concatenate(tablestru.directory, tablestru.table, tablestru.meta, tablestru.concatenate)
+            await this.importar(tablestru.directory, tablestru.table, tablestru.meta)
+        }
 
         const preprocessarTituloDaTabela = (t) => {
-            if (t.startsWith('Tabela Básica') || t.startsWith('Gaju'))
+            if (t.startsWith('Tabela Básica') || t.startsWith('Gaju') || t.startsWith('Substituicao'))
                 return 'aaa' + t.substring('Tabela Básica'.length)
             return t
         }
@@ -137,7 +143,10 @@ function isTabelaBasica(str) {
                 table.data.push(row)
             }
 
-            const filepathname = `${fBasica ? this.enum_dir : this.dir}/${directory}${csv}.csv`
+            let filepathname = `${fBasica ? this.enum_dir : this.dir}/${directory}${csv}.csv`
+            if (directory !== '' && !directory.startsWith('.'))
+                filepathname = `${directory}/${csv}.csv`
+            // console.log(`Localizando arquivo: ${filepathname}`)
             const exists = fs.existsSync(filepathname)
             table.meta.exists = exists
             if (!exists) {
@@ -164,6 +173,46 @@ function isTabelaBasica(str) {
                 });
         })
     }
+
+    concatenate(directory, csv, meta, regex) {
+        return new Promise((resolve, reject) => {
+            // Create a transform stream to convert input data to Latin-1 encoding
+            const latin1TransformStream = new Transform({
+                transform(chunk, encoding, callback) {
+                    const latin1Buffer = iconv.encode(chunk.toString(), "ISO-8859-1")
+                    this.push(latin1Buffer)
+                    callback()
+                },
+            })
+
+            const filepathname = `${process.env.CSVIEWER_DIR_DATA}/${csv}.csv`
+            // Filter the tables that will be concatenated
+            const selectedTables = []
+            this.tableNames.forEach(tname => { if (tname.match(regex)) selectedTables.push(this.tables[tname]) })
+            if (selectedTables.length === 0) return
+
+            // sort by name
+            const selectedRecords = []
+            selectedTables.forEach(t => t.data.forEach(r => selectedRecords.push(r)))
+            selectedRecords.sort((a, b) => {
+                const pka = Func.pk(selectedTables[0], a)
+                const pkb = Func.pk(selectedTables[0], b)
+                if (pka < pkb) {
+                    return -1;
+                }
+                if (pka > pkb) {
+                    return 1;
+                }
+                return 0;
+            })
+
+            const csvStream = format({ delimiter: ';', headers: selectedTables[0].meta.headers.map(h => h.name) });
+            csvStream.pipe(latin1TransformStream).pipe(fs.createWriteStream(filepathname)).on('finish', () => resolve());
+            selectedRecords.forEach(r => csvStream.write(r))
+            csvStream.end();
+        })
+    }
+
 
 }
 
