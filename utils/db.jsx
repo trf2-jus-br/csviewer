@@ -188,7 +188,7 @@ const DB = class DB {
             const filepathname = `${process.env.CSVIEWER_DIR_DATA}/${csv}.csv`
             // Filter the tables that will be concatenated
             const selectedTables = []
-            this.tableNames.forEach(tname => { if (tname.match(regex)) selectedTables.push(this.tables[tname]) })
+            this.tableNames.forEach(tname => { if (tname.match(regex) && this.tables[tname].meta.exists) selectedTables.push(this.tables[tname]) })
             if (selectedTables.length === 0) return
 
             // sort by name
@@ -205,6 +205,11 @@ const DB = class DB {
                 }
                 return 0;
             })
+
+            // console.log(selectedTables)
+
+            if (!selectedRecords || !selectedRecords.length || !selectedTables || !selectedTables.length || !selectedTables[0].meta || !selectedTables[0].meta.headers) 
+                throw `não foi possível gerar a tabela concatenada ${csv}!`
 
             const csvStream = format({ delimiter: ';', headers: selectedTables[0].meta.headers.map(h => h.name) });
             csvStream.pipe(latin1TransformStream).pipe(fs.createWriteStream(filepathname)).on('finish', () => resolve());
