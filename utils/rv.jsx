@@ -2,7 +2,6 @@ import fs from 'fs'
 import { useContext } from './context'
 import { isEmptyObject } from './rv-util'
 import { removeAccents } from './text'
-import buildStructure from './structure.ts'
 
 
 const RV = class RV {
@@ -68,7 +67,7 @@ const RV = class RV {
         this.data[tablename][pk].approved = record
         if (this.data[tablename][pk].error)
             delete this.data[tablename][pk].error
-        this.addEvent(session, tablename, pk, '', 'Aprovação' + (reflected ? ' (refletido)' : ''))
+        this.addEvent(session, tablename, pk, 'Aprovação' + (reflected ? ' (refletido)' : ''))
 
         const tableStructure = this.structure.tables.find(i => i.table === tablename)
         if (tableStructure && tableStructure.alsoUpdate) {
@@ -103,7 +102,7 @@ const RV = class RV {
     async removeApprove(session, tablename, pk, record, message, reflected) {
         this.inicializarPk(tablename, pk)
         delete this.data[tablename][pk].approved
-        this.addEvent(session, tablename, pk, '', 'Cancelamento de Aprovação' + (reflected ? ' (refletido)' : ''))
+        this.addEvent(session, tablename, pk, 'Cancelamento de Aprovação' + (reflected ? ' (refletido)' : ''))
 
         const tableStructure = this.structure.tables.find(i => i.table === tablename)
         if (tableStructure && tableStructure.alsoUpdate)
@@ -116,7 +115,7 @@ const RV = class RV {
         this.data[tablename][pk].error[field] = { value: value, message: message }
         if (this.data[tablename][pk].approved)
             delete this.data[tablename][pk].approved
-        this.addEvent(session, tablename, pk, '', 'Registro de Erro' + (reflected ? ' (refletido)' : ''), `${field}: '${value}' - ${message}`)
+        this.addEvent(session, tablename, pk, 'Registro de Erro' + (reflected ? ' (refletido)' : ''), `${field}: '${value}' - ${message}`)
 
         const tableStructure = this.structure.tables.find(i => i.table === tablename)
         if (tableStructure && tableStructure.alsoUpdate)
@@ -128,7 +127,7 @@ const RV = class RV {
         this.inicializarErro(tablename, pk, field)
         delete this.data[tablename][pk].error[field]
         this.removerErroVazio(tablename, pk)
-        this.addEvent(session, tablename, pk, '', 'Cancelamento de Erro' + (reflected ? ' (refletido)' : ''), `${field}: '${value}'`)
+        this.addEvent(session, tablename, pk, 'Cancelamento de Erro' + (reflected ? ' (refletido)' : ''), `${field}: '${value}'`)
 
         const tableStructure = this.structure.tables.find(i => i.table === tablename)
         if (tableStructure && tableStructure.alsoUpdate)

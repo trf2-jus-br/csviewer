@@ -14,11 +14,8 @@ function isTabelaBasica(str) {
             return false;
         }
 
-        return str.charAt(0).toUpperCase() === str.charAt(0);
+        return str.startsWith('Tabela Básica') || str.startsWith('Tabela-Básica');
     }
-    // if (process.env.CSVIEWER_MODE === 'JUI') {
-    //     return str.startsWith('Gaju')
-    // }
     return false;
 }
 
@@ -60,8 +57,10 @@ const DB = class DB {
         }
 
         const preprocessarTituloDaTabela = (t) => {
-            if (t.startsWith('Tabela Básica') || t.startsWith('Gaju') || t.startsWith('Substituicao'))
+            if (isTabelaBasica(t))
                 return 'aaa' + t.substring('Tabela Básica'.length)
+            if (t.startsWith('Gaju') || t.startsWith('Substituicao'))
+                return 'aaa' + t
             return t
         }
 
@@ -79,16 +78,17 @@ const DB = class DB {
             'complemento_logradouro_pessoa',
             'cep_pessoa',
             'email_pessoal_pessoa',
-            'id_cor_raca_pessoa',
+            // 'id_cor_raca_pessoa',
             'id_municipio_endereco_pessoa',
             'id_pais_endereco_pessoa',
-            'id_tipo_logradouro_pessoa',
-            'id_tipo_sanguineo_pessoa',
+            // 'id_tipo_logradouro_pessoa',
+            // 'id_tipo_sanguineo_pessoa',
             'logradouro_pessoa',
             'dta_nascimento_pessoa',
             'nome_mae_pessoa',
             'nome_pai_pessoa',
             'numero_logradouro_pessoa',
+            'celular_pessoa',
             'telefone_pessoa',
             'nome_conjuge_pessoa'
         ]
@@ -101,6 +101,8 @@ const DB = class DB {
     }
 
     importar(directory, csv, meta) {
+        // console.log(`Importando tabela '${csv}'`)
+        // console.log(`  directory: ${directory}`)
         return new Promise((resolve, reject) => {
             const fBasica = isTabelaBasica(csv)
             this.tableNames.push(csv)
@@ -117,6 +119,7 @@ const DB = class DB {
             this.tables[csv] = table
 
             const addData = row => {
+                // console.log(row)
                 if (process.env.CSVIEWER_MODE === 'SERH') {
                     this.protegerDadosPessoais(row)
 
@@ -133,8 +136,13 @@ const DB = class DB {
                         if (!from) return
                         if (enm.table) {
                             const enumTable = this.tables[enm.table]
+                            if (!enumTable.index[from]) {
+                                console.log(enumTable)
+                                console.log(`Enum index não ${enumTable.index} não contém: ${from}`)
+                            }
                             row[enm.key] = enumTable.index[from][enumTable.meta.descr]
                         } else if (enm.values) {
+                            console.log(enm.values)
                             row[enm.key] = enm.values[from]
                         }
                     })
@@ -144,7 +152,7 @@ const DB = class DB {
             }
 
             let filepathname = `${fBasica ? this.enum_dir : this.dir}/${directory}${csv}.csv`
-            if (directory !== '' && !directory.startsWith('.'))
+            if (directory && directory !== '' && !directory.startsWith('.'))
                 filepathname = `${directory}/${csv}.csv`
             // console.log(`Localizando arquivo: ${filepathname}`)
             const exists = fs.existsSync(filepathname)
@@ -161,9 +169,14 @@ const DB = class DB {
                     headers: true,
                     ignoreEmpty: true,
                     discardUnmappedColumns: true, // isso deveria ser false. está mascarando erro.
+                    quote: '"',
+                    escape: '"',
                     delimiter: fBasica ? ',' : ';'
                 }))
-                .on('error', error => console.error(error))
+                .on('data-invalid', (row, rowNumber, reason) => {
+                    console.log(`Invalid row ${rowNumber}: ${reason}`);
+                })
+                // .on('error', error => console.error(error))
                 .on('headers', row => table.meta.headers = row.map(name => { return { name, caption: humanize(name) } }))
                 .on('data', addData)
                 .on('end', (rowCount) => {
@@ -208,7 +221,7 @@ const DB = class DB {
 
             // console.log(selectedTables)
 
-            if (!selectedRecords || !selectedRecords.length || !selectedTables || !selectedTables.length || !selectedTables[0].meta || !selectedTables[0].meta.headers) 
+            if (!selectedRecords || !selectedRecords.length || !selectedTables || !selectedTables.length || !selectedTables[0].meta || !selectedTables[0].meta.headers)
                 throw `não foi possível gerar a tabela concatenada ${csv}!`
 
             const csvStream = format({ delimiter: ';', headers: selectedTables[0].meta.headers.map(h => h.name) });

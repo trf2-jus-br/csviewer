@@ -51,24 +51,29 @@ export async function getServerSideProps({ req, res, params }) {
       table.meta.related.forEach(r => {
         let rtable = context.db.tables[r]
         if (!rtable) {
-          rtable = { meta: { name: '', headers: [] }, data: [] }
+          rtable = { meta: { name: '', headers: [], fks: [] }, data: [] }
         } else {
-          const pkValues = params.pk.split('|')
-          // console.log(pkValues)
-          // console.log(table.meta.pk)
+          const fks = rtable.meta.fks.filter(fk => fk.relatedTable === props.tablename)
+          if (!fks || fks.length === 0) throw new Error(`FK not found: ${rtable.meta.name} -> ${props.tablename}`)
+          const fk = fks[0]
+          // console.log(fk)
+          const columns = fk.column.split('|')
+          const relatedColumns = (fk.relatedColumn||fk.column).split('|')
           const filtered = rtable.data.filter(row => {
             for (let i = 0; i < table.meta.pk.length; i++) {
-              if (row[table.meta.pk[i]] === pkValues[i]) {
-                // console.log(`Equal: ${row[table.meta.pk[i]]} === ${pkValues[i]}`)
+              if (props.record[columns[i]] === row[relatedColumns[i]]) {
+                // console.log(`Equal: ${props.record[columns[i]]} === ${row[relatedColumns[i]]}`)
                 continue
               }
+              // console.log(row)
+              // console.log(`~Different: ${props.record[columns[i]]} === ${row[relatedColumns[i]]}`)
               return false
             }
             return true
           })
 
           props.related.push({
-            meta: rtable.meta, data: filtered
+            meta: rtable.meta, data: filtered, review: context.rv.data[rtable.meta.name]
           })
         }
       })
@@ -183,7 +188,7 @@ export default function Record(props) {
         <div className="col"><h3>
           <span className={statusClass}>{humanize(props.tablemeta.name)}</span>
           {props.tablemeta.pk.map((s, idx) => {
-            return (<span className={statusClass}>, {humanize(s)}: {pkValue[idx]}</span>)
+            return (<span className={statusClass} key={s}>, {humanize(s)}: {pkValue[idx]}</span>)
           })}
         </h3></div>
         <div className="col col-auto">
@@ -218,7 +223,7 @@ export default function Record(props) {
         </Row>
       </Form>
 
-      {props.related ? props.related.map(t => DbTable(t)) : ''}
+      {props.related ? props.related.map(t => DbTable(t, t.review)) : ''}
 
       {props.rv && props.rv.event ? events(props.rv.event) : ''}
 

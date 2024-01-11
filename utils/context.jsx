@@ -1,6 +1,7 @@
 import DB from './db'
 import RV from './rv'
-import buildStructure from './structure.ts'
+import buildStructureGaju from './structure-gaju.ts'
+import buildStructureSerh from './structure-serh.ts'
 import getConfig from 'next/config'
 const { serverRuntimeConfig } = getConfig()
 
@@ -24,7 +25,7 @@ export class Context {
     setMessage(msg) { message = msg }
 
     async initialize() {
-        this.structure = await buildStructure()
+        this.structure = await (process.env.CSVIEWER_MODE === 'SERH' ? buildStructureSerh() : buildStructureGaju())
         if (this.db) return
         this.db = new DB(this.structure)
         await this.db.carregar(this.setMessage)
