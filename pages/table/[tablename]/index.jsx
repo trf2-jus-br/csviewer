@@ -35,7 +35,7 @@ export async function getServerSideProps({ req, res, params }) {
 
   let table = context.db.tables[params.tablename]
   if (!table)
-    table = { meta: { name: '', headers: [] }, data: [] }
+    table = { meta: { name: '', headers: [], ui: [] }, data: [] }
   props.table = table
 
   let review = context.rv.data[params.tablename]

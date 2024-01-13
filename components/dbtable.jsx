@@ -17,13 +17,13 @@ import { Table as BTable, Pagination, Form } from 'react-bootstrap'
 
 export default function DbTable(dbtable, review) {
 
-    const columns = dbtable.meta.headers.map((c, idx) => {
+    const columns = dbtable.meta.ui.map((c, idx) => {
         const col = {
-            accessorKey: c.name,
+            accessorKey: c.column,
             header: c.caption,
             enableSorting: true,
         }
-        if (dbtable.meta.pk.includes(c.name))
+        if (dbtable.meta.pk.includes(c.column))
             col.cell = data => <a href={`/table/${dbtable.meta.name}/record/${encodeURIComponent(Func.pk(dbtable, data.row.original))}`}>{data.getValue()}</a>
         return col
     })

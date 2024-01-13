@@ -20,6 +20,8 @@ export default async function buildStructure() {
         { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela-Básica-TIPO-LOGRADOURO', meta: { pk: ['id_tipo_logradouro'], descr: 'descricao' } },
         { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela-Básica-TIPO-PESSOA', meta: { pk: ['id_tipo_pessoa'], descr: 'nome' } },
         { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela-Básica-TIPO-SANGUÍNEO', meta: { pk: ['id_tipo_sanguineo'], descr: 'descricao' } },
+        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - SITUAÇÃO', meta: { pk: ['id_situacao'], descr: 'nome' } },
+        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - ORIGEM CRIAÇÃO', meta: { pk: ['id_origem_criacao'], descr: 'descricao' } },
 
         {
             table: 'orgaos_final', meta: {
@@ -78,17 +80,138 @@ export default async function buildStructure() {
                     table: 'orgaos_final', fk: 'identificador_sistema_origem_orgao'
                 }],
                 related: [
+                    'movimentacao_magistrados_final',
                     'afastamentos_magistrados_final',
                     // 'afastamentos_saldos_magistrados_final',
                     // 'concessoes_magistrados_final',
                     // 'desligamento_magistrados_final',
                 ],
-                // related: [
-                //     {column: 'identificador_sistema_origem_ingresso', foreignTable: 'afastamentos_magistrados_final', foreignColumn: 'identificador_sistema_origem_pessoa'},
-                //     'afastamentos_saldos_magistrados_final',
-                //     'concessoes_magistrados_final',
-                //     'desligamento_magistrados_final',
-                // ]
+                ui: [
+                    { column: "identificador_sistema_origem_ingresso" },
+                    { column: "id_tipo_pessoa" },
+                    { column: "nome_pessoa" },
+                    { column: "nome_social_pessoa" },
+                    { column: "dta_nascimento_pessoa" },
+                    { column: "id_tipo_sanguineo_pessoa" },
+                    { column: "nome_mae_pessoa" },
+                    { column: "nome_pai_pessoa" },
+                    { column: "nome_conjuge_pessoa" },
+                    { column: "id_nacionalidade_pessoa" },
+                    { column: "codigo_ibge_municipio_naturalidade_pessoa" },
+                    { column: "nome_municipio_exterior_naturalidade" },
+                    { column: "sexo_pessoa" },
+                    { column: "sin_doador" },
+                    { column: "sin_porte_arma" },
+                    { column: "sin_quitacao_eleitoral" },
+                    { column: "sin_deficiente_pessoa" },
+                    { column: "sin_deficiente" },
+                    { column: "dta_falecimento_pessoa" },
+
+                    { column: "registro_cnh_pessoa", group: 'Identificação' },
+                    { column: "dta_emissao_cnh_pessoa" },
+                    { column: "dta_primeira_cnh_pessoa" },
+                    { column: "dta_validade_cnh_pessoa" },
+                    { column: "categoria_cnh_pessoa" },
+                    { column: "cpf_pessoa" },
+                    { column: "rg_pessoa" },
+                    { column: "dta_expedicao_rg_pessoa" },
+                    { column: "orgao_expedidor_rg_pessoa" },
+                    { column: "uf_rg_pessoa" },
+                    { column: "pis_pasep_pessoa" },
+                    { column: "registro_conselho_profissional" },
+                    { column: "uf_conselho_profissional" },
+                    { column: "titulo_eleitor" },
+                    { column: "zona_eleitoral" },
+                    { column: "secao_eleitoral" },
+                    { column: "dta_ultima_votacao" },
+                    { column: "dta_emissao_titulo" },
+                    { column: "cidade_titulo" },
+                    { column: "uf_titulo" },
+                    { column: "certificado_reservista" },
+                    { column: "categoria_militar" },
+                    { column: "regiao_militar" },
+
+
+                    { column: "id_cor_raca_pessoa" },
+                    { column: "id_estado_civil_pessoa" },
+
+                    { column: "classificacao" },
+
+                    { column: "telefone_pessoa" },
+                    { column: "telefone_funcional_pessoa" },
+                    { column: "email_pessoa", group: 'Contato' },
+                    { column: "email_pessoal_pessoa" },
+                    { column: "celular_pessoa" },
+                    { column: "ramal_pessoal_pessoa" },
+                    { column: "sin_mostra_celular" },
+                    { column: "sin_mostra_telefone" },
+
+                    { column: "id_tipo_logradouro_pessoa", group: 'Endereço' },
+                    { column: "logradouro_pessoa" },
+                    { column: "numero_logradouro_pessoa" },
+                    { column: "complemento_logradouro_pessoa" },
+                    { column: "bairro_pessoa" },
+                    { column: "codigo_ibge_municipio_endereco_pessoa" },
+                    { column: "nome_municipio_exterior_endereco" },
+                    { column: "cep_pessoa" },
+
+                    { column: "id_grau_instrucao_pessoa", group: 'Formação' },
+                    { column: "id_area_curso_grad_estagio" },
+
+                    { column: "id_forma_ingresso", group: 'Ingresso' },
+                    { column: "id_tipo_ingresso" },
+                    { column: "identificador_sistema_origem_orgao_ingresso" },
+                    { column: "identificador_sistema_origem_orgao_origem" },
+                    { column: "matricula" },
+                    { column: "matricula_original" },
+                    { column: "ato_nomeacao" },
+                    { column: "num_edital_concurso" },
+                    { column: "identificador_sistema_origem_orgao_concurso" },
+                    { column: "dta_edital_concurso" },
+                    { column: "dta_validade_concurso" },
+                    { column: "sta_cota" },
+                    { column: "dta_efetivo_orgao" },
+                    { column: "dta_exercicio" },
+                    { column: "dta_exercicio_ferias" },
+                    { column: "dta_homologacao_concurso" },
+                    { column: "dta_nomeacao" },
+                    { column: "dta_publ_nomeacao" },
+                    { column: "dta_posse" },
+                    { column: "identificador_sistema_origem_pessoa" },
+                    { column: "observacao_ingresso" },
+                    { column: "divulgacao_nomeacao" },
+
+                    { column: "id_situacao", group: 'Situação' },
+                    { column: "dta_situacao" },
+                    { column: "dta_publ_situacao" },
+                    { column: "id_regime_trabalho" },
+                    { column: "sigla" },
+                    { column: "dta_ato_situacao" },
+                    { column: "numero_ato_situacao" },
+                    { column: "identificador_sistema_origem_cargo" },
+                    { column: "sta_regime_previdencia" },
+                    { column: "dta_migracao_rpps_teto" },
+                    { column: "sta_vinculo_ininterrupto" },
+                    { column: "sin_tempo_especial" },
+                    { column: "sin_universo_magistrado" },
+                    { column: "divulgacao_situacao" },
+
+
+                    { column: "categoria_trabalhador_esocial", group: 'eSocial' },
+                    { column: "cod_esocial_pais_endereco_pessoa" },
+                    { column: "cod_esocial_pais_nacionalidade_pessoa" },
+                    { column: "cod_esocial_pais_nascimento_pessoa" },
+                    { column: "condicao_ingresso_imigrante_esocial" },
+                    { column: "prazo_residencia_imigrante_esocial" },
+                    { column: "data_chegada_imigrante_esocial" },
+                    { column: "sin_possui_filho_brasileiro_imigrante_esocial" },
+                    { column: "sin_deficiente_visual_esocial" },
+                    { column: "sin_deficiente_auditivo_esocial" },
+                    { column: "sin_deficiente_fisico_esocial" },
+                    { column: "sin_deficiente_mental_esocial" },
+                    { column: "sin_deficiente_intelectual_esocial" },
+                    { column: "sin_reabilitado_deficiencia_esocial" },
+                ]
             }
         },
 
@@ -97,8 +220,29 @@ export default async function buildStructure() {
             table: 'afastamentos_magistrados_final', meta: {
                 pk: ['identificador_sistema_origem_afastamento'],
                 enums: [
-                    { key: 'id_tipo_afastamento_afastamento', table: 'Tabela Básica - TIPO AFASTAMENTO' }],
+                    { key: 'id_tipo_afastamento_afastamento', table: 'Tabela Básica - TIPO AFASTAMENTO' },
+                    { key: 'id_situacao_afastamento', table: 'Tabela Básica - SITUAÇÃO' },
+                    { key: 'id_origem_criacao_afastamento', table: 'Tabela Básica - ORIGEM CRIAÇÃO' },
+                ],
                 fks: [{ column: 'identificador_sistema_origem_pessoa', relatedTable: 'ingresso_magistrados_final', relatedColumn: 'identificador_sistema_origem_pessoa' }],
+                ui: [
+                    { column: "identificador_sistema_origem_afastamento" },
+                    { column: "id_situacao_afastamento" },
+                    { column: "inicio" },
+                    { column: "final" },
+                    { column: "id_tipo_afastamento_afastamento" },
+                    { column: "despacho_afastamento" },
+                    { column: "justificativa_afastamento_afastamento" },
+                    { column: "competencia_afastamento" },
+                    { column: "sin_comprovacao_afastamento" },
+                    { column: "sin_prejuizo_jurisdicao_afastamento" },
+                    { column: "sin_atestado_medico_visivel_afastamento" },
+                    { column: "email_enviado_afastamento" },
+                    { column: "portaria_afastamento" },
+                    { column: "codigo_ibge_municipio" },
+                    { column: "id_origem_criacao_afastamento" },
+                    { column: "identificador_sistema_origem_pessoa" },
+                ]
             }
         },
 
@@ -196,6 +340,7 @@ export default async function buildStructure() {
         {
             table: 'lotacoes_final', meta: {
                 pk: ['identificador_sistema_origem'],
+                descr: 'nome',
                 fks: [{
                     table: 'lotacoes_final', fk: 'identificador_sistema_origem_lotacao_pai'
                 }],
@@ -205,9 +350,27 @@ export default async function buildStructure() {
         {
             table: 'movimentacao_magistrados_final', meta: {
                 pk: ['identificador_sistema_origem_ingresso', 'inicio'],
-                fks: [{
-                    table: 'ingresso_magistrados_final', fk: 'identificador_sistema_origem_ingresso'
-                }],
+                enums: [
+                    { key: 'identificador_sistema_origem_lotacao', table: 'lotacoes_final' },
+                ],
+                fks: [
+                    { column: 'identificador_sistema_origem_ingresso', relatedTable: 'ingresso_magistrados_final', relatedColumn: 'identificador_sistema_origem_ingresso' },
+                    { column: 'identificador_sistema_origem_lotacao', relatedTable: 'lotacao_final', relatedColumn: 'identificador_sistema_origem' },
+                ],
+                ui: [
+                    { column: "identificador_sistema_origem_ingresso" },
+                    { column: "inicio" },
+                    { column: "final" },
+                    { column: "exercicio_vara" },
+                    { column: "id_natureza_movimentacao" },
+                    { column: "identificador_sistema_origem_lotacao" },
+                    { column: "observacao" },
+                    { column: "processo_administrativo" },
+                    { column: "sessao" },
+                    { column: "numero_ato" },
+                    { column: "data_ato" },
+                    { column: "publicacao_ato" },
+                ]
             }
         },
 

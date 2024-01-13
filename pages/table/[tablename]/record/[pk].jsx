@@ -58,7 +58,7 @@ export async function getServerSideProps({ req, res, params }) {
           const fk = fks[0]
           // console.log(fk)
           const columns = fk.column.split('|')
-          const relatedColumns = (fk.relatedColumn||fk.column).split('|')
+          const relatedColumns = (fk.relatedColumn || fk.column).split('|')
           const filtered = rtable.data.filter(row => {
             for (let i = 0; i < table.meta.pk.length; i++) {
               if (props.record[columns[i]] === row[relatedColumns[i]]) {
@@ -198,26 +198,30 @@ export default function Record(props) {
       </div>
       <Form>
         <Row>
-          {props.tablemeta.headers.map(h => {
-            const error = props.rv && props.rv.error ? props.rv.error[h.name] : undefined
+          {props.tablemeta.ui.map(h => {
+            const error = props.rv && props.rv.error ? props.rv.error[h.column] : undefined
             //const error = false
             return (
-              <Form.Group className="mb-3 col col-3" controlId={h.name} key={h.name}>
-                <Form.Label className="mb-0 w-100">
-                  <div className="row">
-                    <div className="col me-auto">{h.caption}</div>
-                    {error
-                      ? (<div className="col col-auto" style={{ color: 'red' }}><a onClick={() => handleRemoveError(h)}><FontAwesomeIcon icon={faBug} /></a></div>)
-                      : (<div className="col col-auto" style={{ color: 'lightgray' }}><a onClick={() => openModalReportError(h)}><FontAwesomeIcon icon={faBugSlash} /></a></div>)
-                    }
-                  </div>
-                </Form.Label>
-                <span className="form-control" dangerouslySetInnerHTML={{ __html: props.record[h.name] ? props.record[h.name] : '&nbsp' }} />
-                {props.rv && props.rv.approved && props.record[h.name] !== props.rv.approved[h.name]
-                  ?
-                  <><Form.Label className="mt-1 mb-0 w-100"><span className="text-warning">Valor Aprovado</span></Form.Label><span className="form-control bg-warning" dangerouslySetInnerHTML={{ __html: props.rv.approved[h.name] ? props.rv.approved[h.name] : '&nbsp' }} /></>
-                  : ''}
-              </Form.Group>
+              <>
+                {h.group ? (<div className="col col-12"><h4>{h.group}</h4></div>) : ''}
+                <Form.Group className={`mb-3 col ${h.width ? 'col-' + h.width : 'col-auto'}`} controlId={h.column} key={h.column}>
+                  <Form.Label className="mb-0 w-100" style={{whiteSpace: 'nowrap'}}>
+                    <div className="rowx">
+                      <span className="colx me-autox">{h.caption}
+                      {error
+                        ? (<span className="colx col-autox" style={{ color: 'red' }}><a onClick={() => handleRemoveError(h)}><FontAwesomeIcon icon={faBug} /></a></span>)
+                        : (<span className="colx col-autox" style={{ color: 'lightgray' }}><a onClick={() => openModalReportError(h)}><FontAwesomeIcon icon={faBugSlash} /></a></span>)
+                      }
+                      </span>
+                    </div>
+                  </Form.Label>
+                  <span className="form-control" style={{whiteSpace: 'nowrap'}} dangerouslySetInnerHTML={{ __html: props.record[h.column] ? props.record[h.column] : '&nbsp' }} />
+                  {props.rv && props.rv.approved && props.record[h.column] !== props.rv.approved[h.column]
+                    ?
+                    <><Form.Label className="mt-1 mb-0 w-100"><span className="text-warning">Valor Aprovado</span></Form.Label><span className="form-control bg-warning" dangerouslySetInnerHTML={{ __html: props.rv.approved[h.column] ? props.rv.approved[h.column] : '&nbsp' }} /></>
+                    : ''}
+                </Form.Group>
+              </>
             )
           })}
         </Row>

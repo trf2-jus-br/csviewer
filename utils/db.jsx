@@ -70,6 +70,36 @@ const DB = class DB {
             console.log('escrevendo em ' + this.cacheFilename)
             fs.writeFileSync(this.cacheFilename, JSON.stringify({ tableNames: this.tableNames, tables: this.tables }));
         }
+
+        // Cria ou valida o meta.ui
+        //
+        this.tableNames.forEach(tname => {
+            const table = this.tables[tname]
+            if (!table.meta || !table.meta.headers) return
+            if (!table.meta.ui) {
+                const ui = []
+                table.meta.headers.forEach(h => {
+                    const column = {
+                        column: h.name,
+                        width: 3,
+                    }
+                    ui.push(column)
+                })
+                table.meta.ui = ui
+                if (!isTabelaBasica(tname))
+                    console.log(`${tname} -> ui: ${JSON.stringify(ui, null, 0).replace(/\[]/g, `[\n${' '.repeat(20)}`).replace(/\},/g, `},\n${' '.repeat(20)}`)}`)
+            } else {
+                table.meta.ui.forEach(c => {
+                    if (!table.meta.headers.find(h => h.name === c.column))
+                        throw new Error(`Tabela ${tname} não contém a coluna ${c.column} que está definida na ui`)
+                })
+                table.meta.headers.forEach(h => {
+                    if (!table.meta.ui.find(c => h.name === c.column))
+                        throw new Error(`Tabela ${tname} contém a coluna ${c.column} que não está definida na ui`)
+                })
+            }
+            table.meta.ui.forEach(c => c.caption = c.caption || humanize(c.column))
+        })
     }
 
     protegerDadosPessoais(row) {
@@ -101,8 +131,6 @@ const DB = class DB {
     }
 
     importar(directory, csv, meta) {
-        // console.log(`Importando tabela '${csv}'`)
-        // console.log(`  directory: ${directory}`)
         return new Promise((resolve, reject) => {
             const fBasica = isTabelaBasica(csv)
             this.tableNames.push(csv)
@@ -142,7 +170,7 @@ const DB = class DB {
                             }
                             row[enm.key] = enumTable.index[from][enumTable.meta.descr]
                         } else if (enm.values) {
-                            console.log(enm.values)
+                            // console.log(enm.values)
                             row[enm.key] = enm.values[from]
                         }
                     })
