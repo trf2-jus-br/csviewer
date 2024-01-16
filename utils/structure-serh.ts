@@ -1,6 +1,30 @@
+import fs from 'fs/promises'
+
 export default async function buildStructure() {
-    const mes = 1
-    const ano = 2024
+
+    const files = await fs.readdir(process.env.DIR_CORRENTE_SERH);
+
+    const regex = /^(?<ano>\d{4})(?<mes>\d{2})(?<dia>\d{2})\.(?<hora>\d{2})(?<minuto>\d{2})(?<segundo>\d{2})$/
+
+    let mostRecent = ''
+    files.forEach((file) => {
+        // console.log(`${file}`);
+        const m = file.match(regex)
+        if (m !== null) {
+            // console.log(`${file} - ${m.groups.ano}-${m.groups.mes}-${m.groups.dia} ${m.groups.hora}:${m.groups.minuto}:${m.groups.segundo}`);
+            if (file > mostRecent) mostRecent = file
+        }
+    });
+    console.log(`Mais recente: ${mostRecent}`);
+
+    const dir = process.env.DIR_CORRENTE_SERH + '/' + mostRecent
+
+    console.log(`DIR_CORRENTE_SERH: ${dir}`);
+
+    const m = regex.exec(mostRecent)
+    const mes = m !== null ? Number(m.groups.mes) : 1
+    const ano = m !== null ? Number(m.groups.ano) : 1900
+    console.log(`Data: ${mes}/${ano}`);
 
     const struc = [
         { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - ÓRGÃO TIPO', meta: { pk: ['id_orgao_tipo'], descr: 'nome' } },
@@ -548,7 +572,7 @@ export default async function buildStructure() {
 
     ]
 
-    struc.forEach((s) => s.directory = s.directory || process.env.DIR_CORRENTE_SERH)
+    struc.forEach((s) => s.directory = s.directory || dir)
 
     return {
         month: mes,

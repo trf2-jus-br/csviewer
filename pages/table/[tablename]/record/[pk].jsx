@@ -104,8 +104,8 @@ export default function Record(props) {
       await Fetcher.post(`${props.CSVIEWER_API_URL_BROWSER}api/addError`, {
         tablename: props.tablename,
         pk: props.pk,
-        field: selectedField.name,
-        value: props.record[selectedField.name],
+        field: selectedField.column,
+        value: props.record[selectedField.column],
         message: text,
       }, { setErrorMessage })
       // console.log(`fetched`)
@@ -118,8 +118,8 @@ export default function Record(props) {
     await Fetcher.post(`${props.CSVIEWER_API_URL_BROWSER}api/removeError`, {
       tablename: props.tablename,
       pk: props.pk,
-      field: field.name,
-      value: props.record[field.name],
+      field: field.column,
+      value: props.record[field.column],
       message: undefined,
     }, { setErrorMessage })
     // console.log(`fetched`)
@@ -165,7 +165,7 @@ export default function Record(props) {
           {array.map((i, idx) => {
             const date = new Date(i.date)
             return (
-              <tr key={idx}>
+              <tr key={`evento: ${idx}`}>
                 <th style={{ textAlign: 'right' }}>{idx + 1}</th>
                 <td>{date.toLocaleDateString('pt-BR')} {date.toLocaleTimeString('pt-BR')}</td>
                 <td>{i.username}</td>
@@ -188,7 +188,7 @@ export default function Record(props) {
         <div className="col"><h3>
           <span className={statusClass}>{humanize(props.tablemeta.name)}</span>
           {props.tablemeta.pk.map((s, idx) => {
-            return (<span className={statusClass} key={s}>, {humanize(s)}: {pkValue[idx]}</span>)
+            return (<span className={statusClass} key={`pk:${s}`}>, {humanize(s)}: {pkValue[idx]}</span>)
           })}
         </h3></div>
         <div className="col col-auto">
@@ -203,8 +203,8 @@ export default function Record(props) {
             //const error = false
             return (
               <>
-                {h.group ? (<div className="col col-12"><h4>{h.group}</h4></div>) : ''}
-                <Form.Group className={`mb-3 col ${h.width ? 'col-' + h.width : 'col-auto'}`} controlId={h.column} key={h.column}>
+                {h.group ? (<div className="col col-12" key={`title: ${h.column}`}><h4>{h.group}</h4></div>) : ''}
+                <Form.Group className={`mb-3 col ${h.width ? 'col-' + h.width : 'col-auto'}`} controlId={h.column} key={`column:${h.column}`}>
                   <Form.Label className="mb-0 w-100" style={{whiteSpace: 'nowrap'}}>
                     <div className="rowx">
                       <span className="colx me-autox">{h.caption}

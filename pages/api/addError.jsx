@@ -6,6 +6,7 @@ const handler = async function (req, res) {
     const context = await useContext()
 
     console.log('Report Error API started')
+    // console.log(req.body)
     const tablename = req.body.tablename
     const pk = req.body.pk
     const field = req.body.field

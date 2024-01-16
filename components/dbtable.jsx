@@ -46,7 +46,7 @@ export default function DbTable(dbtable, review) {
 
     return (
         <>
-            <div className="row">
+            <div className="row" key={`table header: ${dbtable.meta.name}`}>
                 <div className="col"><h3>{humanize(dbtable.meta.name)}</h3></div>
                 <div className="col col-6 col-md-2">
                     <DebouncedInput
@@ -82,8 +82,8 @@ export default function DbTable(dbtable, review) {
                     ))}
                 </Form.Select></div>
             </div>
-            <BTable striped bordered hover size="sm">
-                <thead class="table-dark">
+            <BTable striped bordered hover size="sm" key={`table: ${dbtable.meta.name}`}>
+                <thead className="table-dark">
                     {table.getHeaderGroups().map(headerGroup => (
                         <tr key={headerGroup.id}>
                             {headerGroup.headers.map(header => (

@@ -111,6 +111,7 @@ const RV = class RV {
     }
 
     async addError(session, tablename, pk, field, value, message, reflected) {
+        console.log(`addError(${tablename}, ${pk}, ${field}, ${value}, ${message}, ${reflected})`)
         this.inicializarErro(tablename, pk, field)
         this.data[tablename][pk].error[field] = { value: value, message: message }
         if (this.data[tablename][pk].approved)

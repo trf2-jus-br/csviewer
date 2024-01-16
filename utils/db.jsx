@@ -27,7 +27,6 @@ const DB = class DB {
 
     dir = undefined
     cacheFilename = undefined
-    enum_dir = process.env.DIR_ENUMS
 
     tableNames = []
 
@@ -179,7 +178,7 @@ const DB = class DB {
                 table.data.push(row)
             }
 
-            let filepathname = `${fBasica ? this.enum_dir : this.dir}/${directory}${csv}.csv`
+            let filepathname = `${this.dir}/${directory}${csv}.csv`
             if (directory && directory !== '' && !directory.startsWith('.'))
                 filepathname = `${directory}/${csv}.csv`
             // console.log(`Localizando arquivo: ${filepathname}`)
