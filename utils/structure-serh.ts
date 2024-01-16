@@ -22,6 +22,9 @@ export default async function buildStructure() {
         { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela-Básica-TIPO-SANGUÍNEO', meta: { pk: ['id_tipo_sanguineo'], descr: 'descricao' } },
         { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - SITUAÇÃO', meta: { pk: ['id_situacao'], descr: 'nome' } },
         { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - ORIGEM CRIAÇÃO', meta: { pk: ['id_origem_criacao'], descr: 'descricao' } },
+        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - NATUREZA MOVIMENTAÇÃO', meta: { pk: ['id_natureza_movimentacao'], descr: 'descricao' } },
+        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - TIPO SALDO DIAS MAGISTRADOS', meta: { pk: ['ID'], descr: 'NOME' } },
+        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - TIPO DÉBITO PERÍODO AQUISITIVO', meta: { pk: ['ID'], descr: 'NOME' } },
 
         {
             table: 'orgaos_final', meta: {
@@ -81,8 +84,16 @@ export default async function buildStructure() {
                 }],
                 related: [
                     'movimentacao_magistrados_final',
+
                     'afastamentos_magistrados_final',
-                    // 'afastamentos_saldos_magistrados_final',
+                    'afastamentos_folgas_magistrados_final',
+                    'afastamentos_saldos_magistrados_final',
+
+                    'ferias_abono_magistrados_final',
+                    'ferias_debitos_final',
+                    'ferias_magistrados_final',
+                    'ferias_primeiroperiodo_final',
+
                     // 'concessoes_magistrados_final',
                     // 'desligamento_magistrados_final',
                 ],
@@ -248,20 +259,63 @@ export default async function buildStructure() {
 
         {
             table: 'afastamentos_folgas_magistrados_final', meta: {
-                pk: ['identificador_sistema_origem_ingresso', 'efetivo_desligamento'],
-                fks: [{
-                    table: 'ingresso_magistrados_final', fk: 'identificador_sistema_origem_ingresso'
-                }],
+                pk: ['identificador_sistema_origem_juiz_ingresso', 'inicial'],
+                enums: [
+                    {
+                        key: 'sta_tipo',
+                        values: {
+                            I: 'Fim de Semana',
+                            E: 'Feriado',
+                            A: 'Feriadão'
+                        }
+                    },
+                ],
+                fks: [
+                    { column: 'identificador_sistema_origem_juiz_ingresso', relatedTable: 'ingresso_magistrados_final', relatedColumn: 'identificador_sistema_origem_ingresso' },
+                ],
+
+                ui: [
+                    { "column": "identificador_sistema_origem_juiz_ingresso" },
+                    { "column": "inicial" },
+                    { "column": "final" },
+                    { "column": "numero_dias" },
+                    { "column": "sin_deferido" },
+                    { "column": "homologacao" },
+                    { "column": "sta_tipo" },
+                    { "column": "documento_sei" },
+                    { "column": "identificador_sistema_origem_diretor_ingresso" },
+                    { "column": "identificador_sistema_origem_homologador_ingresso" }]
             }
         },
 
         {
             table: 'afastamentos_saldos_magistrados_final', meta: {
-                pk: ['identificador_sistema_origem_ingresso', 'efetivo_desligamento'],
-                fks: [{
-                    table: 'ingresso_magistrados_final', fk: 'identificador_sistema_origem_ingresso'
-                }],
-            }
+                pk: ['identificador_sistema_origem_pessoa', 'inicial'],
+                enums: [
+                    { key: 'id_tipo_saldo_dias_magistrado', table: 'Tabela Básica - TIPO SALDO DIAS MAGISTRADOS' },
+                    {
+                        key: 'sta_situacao',
+                        values: {
+                            D: 'Deferido',
+                            I: 'Indeferido',
+                            N: 'Não Avaliado'
+                        }
+                    },
+                ],
+                fks: [
+                    { column: 'identificador_sistema_origem_pessoa', relatedTable: 'ingresso_magistrados_final', relatedColumn: 'identificador_sistema_origem_pessoa' },
+                ],
+                ui: [
+                    { "column": "identificador_sistema_origem_pessoa" },
+                    { "column": "inicial" },
+                    { "column": "final" },
+                    { "column": "id_tipo_saldo_dias_magistrado" },
+                    { "column": "saldo" },
+                    { "column": "concessao" },
+                    { "column": "observacao" },
+                    { "column": "sta_situacao" },
+                ]
+            },
         },
 
         {
@@ -295,36 +349,115 @@ export default async function buildStructure() {
         {
             table: 'ferias_abono_magistrados_final', meta: {
                 pk: ['identificador_sistema_origem_pessoa', 'periodo_aquisitivo', 'sta_sequencial', 'sta_tipo', 'inicial', 'final'],
-                fks: [{
-                    table: 'ingresso_magistrados_final', fk: 'identificador_sistema_origem_pessoa'
-                }],
+                enums: [
+                    {
+                        key: 'sta_tipo',
+                        values: {
+                            A: 'Anterior',
+                            P: 'Posterior'
+                        }
+                    },
+                ],
+                fks: [
+                    { column: 'identificador_sistema_origem_pessoa', relatedTable: 'ingresso_magistrados_final', relatedColumn: 'identificador_sistema_origem_pessoa' },
+                ],
+                ui: [
+                    { "column": "identificador_sistema_origem_pessoa" },
+                    { "column": "periodo_aquisitivo" },
+                    { "column": "sta_sequencial" },
+                    { "column": "sta_tipo" },
+                    { "column": "inicial" },
+                    { "column": "final" },
+                    { "column": "codigo_folha" },
+                    { "column": "identificador_sistema_origem_orgao_folha" },
+                ]
             }
         },
 
         {
+
+
             table: 'ferias_debitos_final', meta: {
                 pk: ['identificador_sistema_origem_pessoa', 'periodo_aquisitivo', 'sta_sequencial', 'parte', 'quantidade_dias', 'justificativa'],
-                fks: [{
-                    table: 'ingresso_magistrados_final', fk: 'identificador_sistema_origem_pessoa'
-                }],
+                enums: [
+                    { key: 'id_tipo_debito_periodo_aquisit', table: 'Tabela Básica - TIPO DÉBITO PERÍODO AQUISITIVO' },
+                ],
+                fks: [
+                    { column: 'identificador_sistema_origem_pessoa', relatedTable: 'ingresso_magistrados_final', relatedColumn: 'identificador_sistema_origem_pessoa' },
+                ],
+                ui: [
+                    { "column": "identificador_sistema_origem_pessoa" },
+                    { "column": "id_tipo_debito_periodo_aquisit" },
+                    { "column": "periodo_aquisitivo" },
+                    { "column": "sta_sequencial" },
+                    { "column": "parte" },
+                    { "column": "quantidade_dias" },
+                    { "column": "justificativa" },
+                ]
             }
         },
 
         {
             table: 'ferias_magistrados_final', meta: {
                 pk: ['identificador_sistema_origem'],
-                fks: [{
-                    table: 'ingresso_magistrados_final', fk: 'identificador_sistema_origem_pessoa'
-                }],
+                enums: [
+                    { key: 'id_situacao', table: 'Tabela Básica - SITUAÇÃO' },
+                    {
+                        key: 'sta_tipo_ferias',
+                        values: {
+                            M: 'Marcação',
+                            R: 'Remarcação',
+                            C: 'Cancelamento',
+                            I: 'Interrupção',
+                        }
+                    },
+                    {
+                        key: 'sta_abono_pecuniario',
+                        values: {
+                            N: 'Sem Abono Pecuniário',
+                            A: 'Anterior',
+                            P: 'Posterior',
+                        }
+                    },
+                ],
+                fks: [
+                    { column: 'identificador_sistema_origem_pessoa', relatedTable: 'ingresso_magistrados_final', relatedColumn: 'identificador_sistema_origem_pessoa' },
+                ],
+                ui: [
+                    { "column": "identificador_sistema_origem" },
+                    { "column": "identificador_sistema_origem_pessoa" },
+                    { "column": "id_situacao" },
+                    { "column": "sta_tipo_ferias" },
+                    { "column": "periodo_aquisitivo" },
+                    { "column": "sta_sequencial" },
+                    { "column": "inicio" },
+                    { "column": "final" },
+                    { "column": "sin_gratificacao_natalina" },
+                    { "column": "sin_antecipacao_ferias" },
+                    { "column": "justificativa" },
+                    { "column": "sta_abono_pecuniario" },
+                    { "column": "portaria" },
+                    { "column": "despacho" },
+                    { "column": "competencia" },
+                    { "column": "email_enviado" },
+                    { "column": "escala" },
+                ]
             }
         },
 
         {
             table: 'ferias_primeiroperiodo_final', meta: {
-                pk: ['identificador_sistema_origem_pessoa'],
-                fks: [{
-                    table: 'ingresso_magistrados_final', fk: 'identificador_sistema_origem_pessoa'
-                }],
+                pk: ['identificador_sistema_origem_pessoa', 'periodo_aquisitivo', 'sta_sequencial'],
+                fks: [
+                    { column: 'identificador_sistema_origem_pessoa', relatedTable: 'ingresso_magistrados_final', relatedColumn: 'identificador_sistema_origem_pessoa' },
+                ],
+                ui: [
+                    { "column": "identificador_sistema_origem_pessoa" },
+                    { "column": "periodo_aquisitivo" },
+                    { "column": "sta_sequencial" },
+                    { "column": "inicio" },
+                    { "column": "observacao" },
+                ]
             }
         },
 
@@ -352,6 +485,8 @@ export default async function buildStructure() {
                 pk: ['identificador_sistema_origem_ingresso', 'inicio'],
                 enums: [
                     { key: 'identificador_sistema_origem_lotacao', table: 'lotacoes_final' },
+                    { key: 'id_natureza_movimentacao', table: 'Tabela Básica - NATUREZA MOVIMENTAÇÃO' },
+
                 ],
                 fks: [
                     { column: 'identificador_sistema_origem_ingresso', relatedTable: 'ingresso_magistrados_final', relatedColumn: 'identificador_sistema_origem_ingresso' },

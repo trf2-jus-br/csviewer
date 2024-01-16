@@ -57,16 +57,16 @@ export async function getServerSideProps({ req, res, params }) {
           if (!fks || fks.length === 0) throw new Error(`FK not found: ${rtable.meta.name} -> ${props.tablename}`)
           const fk = fks[0]
           // console.log(fk)
-          const columns = fk.column.split('|')
-          const relatedColumns = (fk.relatedColumn || fk.column).split('|')
+          const relatedColumns = fk.column.split('|')
+          const myColumns = (fk.relatedColumn || fk.column).split('|')
           const filtered = rtable.data.filter(row => {
-            for (let i = 0; i < table.meta.pk.length; i++) {
-              if (props.record[columns[i]] === row[relatedColumns[i]]) {
-                // console.log(`Equal: ${props.record[columns[i]]} === ${row[relatedColumns[i]]}`)
+            for (let i = 0; i < relatedColumns.length; i++) {
+              if (row[relatedColumns[i]] && props.record[myColumns[i]] === row[relatedColumns[i]]) {
+                // console.log(`Equal: ${myColumns[i]}: ${props.record[myColumns[i]]} === ${relatedColumns[i]}: ${row[relatedColumns[i]]}`)
                 continue
               }
               // console.log(row)
-              // console.log(`~Different: ${props.record[columns[i]]} === ${row[relatedColumns[i]]}`)
+              // console.log(`Different: ${myColumns[i]}: ${props.record[myColumns[i]]} === ${relatedColumns[i]}: ${row[relatedColumns[i]]}`)
               return false
             }
             return true
