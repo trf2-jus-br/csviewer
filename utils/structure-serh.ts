@@ -49,7 +49,8 @@ export default async function buildStructure() {
         { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - NATUREZA MOVIMENTAÇÃO', meta: { pk: ['id_natureza_movimentacao'], descr: 'descricao' } },
         { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - TIPO SALDO DIAS MAGISTRADOS', meta: { pk: ['ID'], descr: 'NOME' } },
         { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - TIPO DÉBITO PERÍODO AQUISITIVO', meta: { pk: ['ID'], descr: 'NOME' } },
-
+        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - TIPO DESIGNAÇÃO', meta: { pk: ['id_tipo_designacao'], descr: 'TIPO DE DESIGNAÇÃO' } },
+        	
         {
             table: 'orgaos_final', meta: {
                 pk: ['identificador_sistema_origem_orgao'],
@@ -108,7 +109,7 @@ export default async function buildStructure() {
                 }],
                 related: [
                     'movimentacao_magistrados_final',
-
+                    'designacao_magistrados_final',
                     'afastamentos_magistrados_final',
                     'afastamentos_folgas_magistrados_final',
                     'afastamentos_saldos_magistrados_final',
@@ -350,14 +351,46 @@ export default async function buildStructure() {
                 }],
             }
         },
-
+        
         {
             table: 'designacao_magistrados_final', meta: {
                 pk: ['identificador_sistema_origem_designacao'],
                 descr: 'nome_pessoa',
-                fks: [{
-                    table: 'orgaos_final', fk: 'identificador_sistema_origem_orgao'
-                }]
+                enums: [
+                    //{ key: 'identificador_sistema_origem_pessoa_afastada', table: 'Tabela Básica - TIPO SALDO DIAS MAGISTRADOS' },
+                ],
+                fks: [
+                    { column: 'identificador_sistema_origem_pessoa', relatedTable: 'ingresso_magistrados_final', relatedColumn: 'identificador_sistema_origem_pessoa' },
+                ],
+                ui: [
+                    {"column":"identificador_sistema_origem_designacao","width":3},
+                    {"column":"identificador_sistema_origem_pessoa","width":3},
+                    {"column":"identificador_sistema_origem_pessoa_afastada","width":3},
+                    {"column":"identificador_sistema_origem_id_lotacao","width":3},
+                    {"column":"id_tipo_designacao","width":3},
+                    {"column":"id_situacao_designacao","width":3},
+                    {"column":"portaria","width":3},
+                    {"column":"competencia_designacao","width":3},
+                    {"column":"observacao_designacao","width":3},
+                    {"column":"despacho_designacao","width":3},
+                    {"column":"inicial","width":3},
+                    {"column":"final","width":3},
+                    {"column":"sta_prejuizo_jurisdicao","width":3},
+                    {"column":"sin_titularidade_plena","width":3},
+                    {"column":"num_documento_inicial_designacao","width":3},
+                    {"column":"num_documento_final_designacao","width":3},
+                    {"column":"id_tipo_documento_inicial_designacao","width":3},
+                    {"column":"documento_inicial_designacao","width":3},
+                    {"column":"publicacao_inicial_designacao","width":3},
+                    {"column":"id_tipo_documento_final_designacao","width":3},
+                    {"column":"documento_final_designacao","width":3},
+                    {"column":"publicacao_final_designacao","width":3},
+                    {"column":"email_enviado_designacao","width":3},
+                    {"column":"id_origem_criacao_designacao","width":3},
+                    {"column":"id_tipo_afastamento_designacao","width":3},
+                    {"column":"nome_orgao_emissor_designacao","width":3},
+                    {"column":"sigla_orgao_emissor_designacao","width":3},
+                ]
             }
         },
 
