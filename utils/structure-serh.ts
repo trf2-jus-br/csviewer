@@ -2,7 +2,7 @@ import fs from 'fs/promises'
 
 export default async function buildStructure() {
 
-    const files = await fs.readdir(process.env.DIR_CORRENTE_SERH);
+    const files = await fs.readdir(process.env.CSVIEWER_DIR_SERH);
 
     const regex = /^(?<ano>\d{4})(?<mes>\d{2})(?<dia>\d{2})\.(?<hora>\d{2})(?<minuto>\d{2})(?<segundo>\d{2})$/
 
@@ -17,9 +17,9 @@ export default async function buildStructure() {
     });
     console.log(`Mais recente: ${mostRecent}`);
 
-    const dir = process.env.DIR_CORRENTE_SERH + '/' + mostRecent
+    const dir = process.env.CSVIEWER_DIR_SERH + '/' + mostRecent
 
-    console.log(`DIR_CORRENTE_SERH: ${dir}`);
+    console.log(`CSVIEWER_DIR_SERH: ${dir}`);
 
     const m = regex.exec(mostRecent)
     const mes = m !== null ? Number(m.groups.mes) : 1
@@ -27,29 +27,30 @@ export default async function buildStructure() {
     console.log(`Data: ${mes}/${ano}`);
 
     const struc = [
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - ÓRGÃO TIPO', meta: { pk: ['id_orgao_tipo'], descr: 'nome' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - ÓRGÃO PODER', meta: { pk: ['id_orgao_poder'], descr: 'nome' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - TIPO AFASTAMENTO', meta: { pk: ['id_tipo_afastamento'], descr: 'nome' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - CARGOS', meta: { pk: ['id_cargo'], descr: 'NOME' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - COR-RAÇA', meta: { pk: ['id_cor_raca'], descr: 'descricao' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - ESTADO CIVIL', meta: { pk: ['TRF4'], descr: 'descricao' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - FORMA INGRESSO', meta: { pk: ['id_forma_ingresso'], descr: 'descricao' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - GRAU INSTRUÇÃO', meta: { pk: ['id_grau_instrucao'], descr: 'descricao' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - NACIONALIDADE', meta: { pk: ['id_nacionalidade'], descr: 'descricao' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - PAÍS', meta: { pk: ['cod_esocial'], descr: 'nome' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - ÓRGÃO TIPO', meta: { pk: ['id_orgao_tipo'], descr: 'nome' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - ÓRGÃO PODER', meta: { pk: ['id_orgao_poder'], descr: 'nome' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - TIPO AFASTAMENTO', meta: { pk: ['id_tipo_afastamento'], descr: 'nome' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - CARGOS', meta: { pk: ['id_cargo'], descr: 'NOME' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - COR-RAÇA', meta: { pk: ['id_cor_raca'], descr: 'descricao' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - ESTADO CIVIL', meta: { pk: ['TRF4'], descr: 'descricao' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - FORMA INGRESSO', meta: { pk: ['id_forma_ingresso'], descr: 'descricao' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - GRAU INSTRUÇÃO', meta: { pk: ['id_grau_instrucao'], descr: 'descricao' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - NACIONALIDADE', meta: { pk: ['id_nacionalidade'], descr: 'descricao' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - PAÍS', meta: { pk: ['cod_esocial'], descr: 'nome' } },
 
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - REGIME TRABALHO', meta: { pk: ['id_regime_trabalho'], descr: 'descricao' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - SITUAÇÃO PESSOA', meta: { pk: ['TRF4'], descr: 'nome' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela-Básica-TIPO-INGRESSO', meta: { pk: ['id_tipo_ingresso'], descr: 'nome' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela-Básica-TIPO-LOGRADOURO', meta: { pk: ['id_tipo_logradouro'], descr: 'descricao' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela-Básica-TIPO-PESSOA', meta: { pk: ['id_tipo_pessoa'], descr: 'nome' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela-Básica-TIPO-SANGUÍNEO', meta: { pk: ['id_tipo_sanguineo'], descr: 'descricao' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - SITUAÇÃO', meta: { pk: ['id_situacao'], descr: 'nome' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - ORIGEM CRIAÇÃO', meta: { pk: ['id_origem_criacao'], descr: 'descricao' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - NATUREZA MOVIMENTAÇÃO', meta: { pk: ['id_natureza_movimentacao'], descr: 'descricao' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - TIPO SALDO DIAS MAGISTRADOS', meta: { pk: ['ID'], descr: 'NOME' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - TIPO DÉBITO PERÍODO AQUISITIVO', meta: { pk: ['ID'], descr: 'NOME' } },
-        { directory: process.env.DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - TIPO DESIGNAÇÃO', meta: { pk: ['id_tipo_designacao'], descr: 'TIPO DE DESIGNAÇÃO' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - REGIME TRABALHO', meta: { pk: ['id_regime_trabalho'], descr: 'descricao' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - SITUAÇÃO PESSOA', meta: { pk: ['TRF4'], descr: 'nome' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela-Básica-TIPO-INGRESSO', meta: { pk: ['id_tipo_ingresso'], descr: 'nome' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela-Básica-TIPO-LOGRADOURO', meta: { pk: ['id_tipo_logradouro'], descr: 'descricao' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela-Básica-TIPO-PESSOA', meta: { pk: ['id_tipo_pessoa'], descr: 'nome' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela-Básica-TIPO-SANGUÍNEO', meta: { pk: ['id_tipo_sanguineo'], descr: 'descricao' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - SITUAÇÃO', meta: { pk: ['id_situacao'], descr: 'nome' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - ORIGEM CRIAÇÃO', meta: { pk: ['id_origem_criacao'], descr: 'descricao' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - NATUREZA MOVIMENTAÇÃO', meta: { pk: ['id_natureza_movimentacao'], descr: 'descricao' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - TIPO SALDO DIAS MAGISTRADOS', meta: { pk: ['ID'], descr: 'NOME' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - TIPO DÉBITO PERÍODO AQUISITIVO', meta: { pk: ['ID'], descr: 'NOME' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - TIPO DESIGNAÇÃO', meta: { pk: ['id_tipo_designacao'], descr: 'nome' } },
+        { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - DOCUMENTO LEGAL TIPO', meta: { pk: ['id_documento_legal_tipo'], descr: 'nome' } },
         	
         {
             table: 'orgaos_final', meta: {
@@ -357,6 +358,12 @@ export default async function buildStructure() {
                 pk: ['identificador_sistema_origem_designacao'],
                 descr: 'nome_pessoa',
                 enums: [
+                    { key: 'id_tipo_designacao', table: 'Tabela Básica - TIPO DESIGNAÇÃO' },
+                    { key: 'id_situacao_designacao', table: 'Tabela Básica - SITUAÇÃO' },
+                    { key: 'id_tipo_documento_inicial_designacao', table: 'Tabela Básica - DOCUMENTO LEGAL TIPO' },
+                    { key: 'id_tipo_documento_final_designacao', table: 'Tabela Básica - DOCUMENTO LEGAL TIPO' },
+                    { key: 'id_tipo_afastamento_designacao', table: 'Tabela Básica - TIPO AFASTAMENTO' },
+                    { key: 'id_origem_criacao_designacao', table: 'Tabela Básica - ORIGEM CRIAÇÃO' },
                     //{ key: 'identificador_sistema_origem_pessoa_afastada', table: 'Tabela Básica - TIPO SALDO DIAS MAGISTRADOS' },
                 ],
                 fks: [
@@ -610,7 +617,7 @@ export default async function buildStructure() {
     return {
         month: mes,
         year: ano,
-        reviewFilename: `${process.env.CSVIEWER_DIR_DATA}/review_serh_${mes}_${ano}.json`,
+        reviewFilename: `${process.env.CSVIEWER_DIR_DATA}/review_serh.json`,
         tables: struc
     }
 }
