@@ -94,7 +94,7 @@ const DB = class DB {
                 })
                 table.meta.headers.forEach(h => {
                     if (!table.meta.ui.find(c => h.name === c.column))
-                        throw new Error(`Tabela ${tname} contém a coluna ${c.column} que não está definida na ui`)
+                        throw new Error(`Tabela ${tname} contém a coluna ${h.name} que não está definida na ui`)
                 })
             }
             table.meta.ui.forEach(c => c.caption = c.caption || humanize(c.column))
