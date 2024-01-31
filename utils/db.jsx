@@ -56,6 +56,7 @@ const DB = class DB {
             const tablestru = this.structure.tables[i]
             if (tablestru.concatenate)
                 await this.concatenate(tablestru.directory, tablestru.table, tablestru.meta, tablestru.concatenate)
+            // console.log('directory', tablestru.directory, 'table', tablestru.table, 'meta', tablestru.meta)
             await this.importar(tablestru.directory, tablestru.table, tablestru.meta)
         }
 
@@ -146,7 +147,7 @@ const DB = class DB {
             let filepathname = `${fBasica ? this.enum_dir : this.dir}/${directory}${csv}.csv`
             if (directory !== '' && !directory.startsWith('.'))
                 filepathname = `${directory}/${csv}.csv`
-            // console.log(`Localizando arquivo: ${filepathname}`)
+            console.log(`Localizando arquivo: ${filepathname}`)
             const exists = fs.existsSync(filepathname)
             table.meta.exists = exists
             if (!exists) {
