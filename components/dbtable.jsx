@@ -30,7 +30,7 @@ export default function DbTable(dbtable, review) {
 
     const [sorting, setSorting] = React.useState([])
     const [globalFilter, setGlobalFilter] = React.useState('')
-    console.log(columns)
+    // console.log(columns)
     const table = useReactTable({
         data: dbtable.data,
         columns,
