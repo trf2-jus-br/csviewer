@@ -84,6 +84,7 @@ export default async function Record({ params }) {
         r.data
           .filter(d => tl.start(d))
           .forEach(d => {
+            if (tl.start(d) && tl.start(d) > maxDate) maxDate = tl.start(d)
             if (tl.end(d) && tl.end(d) > maxDate) maxDate = tl.end(d)
           })
       }
