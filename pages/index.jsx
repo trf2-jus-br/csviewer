@@ -36,6 +36,7 @@ export async function getServerSideProps({ req, res, params }) {
   return {
     props: {
       CSVIEWER_API_URL_BROWSER: process.env.CSVIEWER_API_URL_BROWSER,
+      directory: context.db.structure.directory,
       tables: context.db.tableNames.map((i, idx) => {
         return {
           meta: JSON.parse(JSON.stringify(context.db.tables[i].meta)),
@@ -93,7 +94,7 @@ export default function Home(props) {
     <Layout errorMessage={errorMessage} setErrorMessage={setErrorMessage}>
       <div className="row">
         <div className="col"><h3 className="mb-1">Tabelas</h3></div>
-        <div className="col col-auto"><Button variant={reloading ? 'warning' : 'light'} onClick={handleReloadContext}><FontAwesomeIcon icon={faRefresh} /></Button></div>
+        <div className="col col-auto"><Button variant={reloading ? 'warning' : 'light'} onClick={handleReloadContext} title={props.directory}><FontAwesomeIcon icon={faRefresh} /></Button></div>
       </div>
 
       <table className="table table-sm table-striped">

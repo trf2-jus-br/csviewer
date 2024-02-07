@@ -164,7 +164,6 @@ const DB = class DB {
                         if (enm.table) {
                             const enumTable = this.tables[enm.table]
                             if (!enumTable.index[from]) {
-                                console.log(enumTable)
                                 console.log(`Enum index não ${enumTable.index} não contém: ${from}`)
                             }
                             row[enm.key] = enumTable.index[from][enumTable.meta.descr]

@@ -17,7 +17,7 @@ import { Table as BTable, Pagination, Form } from 'react-bootstrap'
 
 export default function DbTable(dbtable, review) {
 
-    const columns = dbtable.meta.ui.map((c, idx) => {
+    const columns = dbtable.meta.ui.filter(c => c.column).map((c, idx) => {
         const col = {
             accessorKey: c.column,
             header: c.caption,
@@ -30,6 +30,7 @@ export default function DbTable(dbtable, review) {
 
     const [sorting, setSorting] = React.useState([])
     const [globalFilter, setGlobalFilter] = React.useState('')
+    console.log(columns)
     const table = useReactTable({
         data: dbtable.data,
         columns,

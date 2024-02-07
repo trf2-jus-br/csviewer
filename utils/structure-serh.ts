@@ -1,4 +1,6 @@
 import fs from 'fs/promises'
+import { maiusculasEMinusculas } from './text';
+import { dateFromDDMMYYYY } from './date';
 
 export default async function buildStructure() {
 
@@ -51,7 +53,7 @@ export default async function buildStructure() {
         { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - TIPO DÉBITO PERÍODO AQUISITIVO', meta: { pk: ['ID'], descr: 'NOME' } },
         { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - TIPO DESIGNAÇÃO', meta: { pk: ['id_tipo_designacao'], descr: 'nome' } },
         { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - DOCUMENTO LEGAL TIPO', meta: { pk: ['id_documento_legal_tipo'], descr: 'nome' } },
-        	
+
         {
             table: 'orgaos_final', meta: {
                 pk: ['identificador_sistema_origem_orgao'],
@@ -79,6 +81,35 @@ export default async function buildStructure() {
             }
         },
 
+        {
+            table: 'lotacoes_final', meta: {
+                pk: ['identificador_sistema_origem'],
+                descr: 'nome',
+                fks: [{
+                    table: 'lotacoes_final', fk: 'identificador_sistema_origem_lotacao_pai'
+                }],
+                ui: [
+                    { "column": "identificador_sistema_origem" },
+                    { "column": "identificador_sistema_origem_lotacao_pai" },
+                    { "column": "identificador_sistema_origem_orgao_lotacao" },
+                    { "column": "num_ordem_circunscricao" },
+                    { "column": "num_ordenacao" },
+                    { "column": "nome" },
+                    { "column": "sigla" },
+                    { "column": "nome_extenso" },
+                    { "column": "telefone" },
+                    { "column": "ramal" },
+                    { "column": "email" },
+                    { "column": "fax" },
+                    { "column": "dta_inicio" },
+                    { "column": "dta_final" },
+                    { "column": "sin_lotacao_desligado_informacao_lotacao" },
+                    { "column": "identificador_sistema_origem_informacao_lotacao" },
+                    { "column": "codigo_ibge_cidade" },
+                    { "column": "sta_restricao_vaga" },
+                    { "column": "sta_tipo_judicial_unidade" }]
+            }
+        },
 
         {
             table: 'ingresso_magistrados_final', meta: {
@@ -111,6 +142,7 @@ export default async function buildStructure() {
                 related: [
                     'movimentacao_magistrados_final',
                     'designacao_magistrados_final',
+
                     'afastamentos_magistrados_final',
                     'afastamentos_folgas_magistrados_final',
                     'afastamentos_saldos_magistrados_final',
@@ -279,7 +311,13 @@ export default async function buildStructure() {
                     { column: "codigo_ibge_municipio" },
                     { column: "id_origem_criacao_afastamento" },
                     { column: "identificador_sistema_origem_pessoa" },
-                ]
+                ],
+                timeline: {
+                    start: row => dateFromDDMMYYYY(row.inicio),
+                    end: row => dateFromDDMMYYYY(row.final) || new Date(),
+                    position: (row) => 'Afastamentos',
+                    name: (row) => (maiusculasEMinusculas(row.id_tipo_afastamento_afastamento || '')),
+                }
             }
         },
 
@@ -352,7 +390,7 @@ export default async function buildStructure() {
                 }],
             }
         },
-        
+
         {
             table: 'designacao_magistrados_final', meta: {
                 pk: ['identificador_sistema_origem_designacao'],
@@ -364,42 +402,51 @@ export default async function buildStructure() {
                     { key: 'id_tipo_documento_final_designacao', table: 'Tabela Básica - DOCUMENTO LEGAL TIPO' },
                     { key: 'id_tipo_afastamento_designacao', table: 'Tabela Básica - TIPO AFASTAMENTO' },
                     { key: 'id_origem_criacao_designacao', table: 'Tabela Básica - ORIGEM CRIAÇÃO' },
+                    { key: 'identificador_sistema_origem_id_lotacao', table: 'lotacoes_final' },
                     //{ key: 'identificador_sistema_origem_pessoa_afastada', table: 'Tabela Básica - TIPO SALDO DIAS MAGISTRADOS' },
                 ],
                 fks: [
                     { column: 'identificador_sistema_origem_pessoa', relatedTable: 'ingresso_magistrados_final', relatedColumn: 'identificador_sistema_origem_pessoa' },
+                    { column: 'identificador_sistema_origem_id_lotacao', relatedTable: 'lotacoes_final', relatedColumn: 'identificador_sistema_origem' },
                 ],
                 ui: [
-                    {"column":"identificador_sistema_origem_designacao","width":3},
-                    {"column":"identificador_sistema_origem_pessoa","width":3},
-                    {"column":"identificador_sistema_origem_pessoa_afastada","width":3},
-                    {"column":"identificador_sistema_origem_id_lotacao","width":3},
-                    {"column":"id_tipo_designacao","width":3},
-                    {"column":"id_situacao_designacao","width":3},
-                    {"column":"portaria","width":3},
-                    {"column":"competencia_designacao","width":3},
-                    {"column":"observacao_designacao","width":3},
-                    {"column":"despacho_designacao","width":3},
-                    {"column":"inicial","width":3},
-                    {"column":"final","width":3},
-                    {"column":"sta_prejuizo_jurisdicao","width":3},
-                    {"column":"sta_tipo_revogacao_designacao","width":3},
-                    {"column":"sin_titularidade_plena","width":3},
-                    {"column":"sin_com_grat_acumulo_manual_designacao","width":3},
-                    {"column":"num_documento_inicial_designacao","width":3},
-                    {"column":"num_documento_final_designacao","width":3},
-                    {"column":"id_tipo_documento_inicial_designacao","width":3},
-                    {"column":"documento_inicial_designacao","width":3},
-                    {"column":"publicacao_inicial_designacao","width":3},
-                    {"column":"id_tipo_documento_final_designacao","width":3},
-                    {"column":"documento_final_designacao","width":3},
-                    {"column":"publicacao_final_designacao","width":3},
-                    {"column":"email_enviado_designacao","width":3},
-                    {"column":"id_origem_criacao_designacao","width":3},
-                    {"column":"id_tipo_afastamento_designacao","width":3},
-                    {"column":"nome_orgao_emissor_designacao","width":3},
-                    {"column":"sigla_orgao_emissor_designacao","width":3},
-                ]
+                    { "column": "identificador_sistema_origem_designacao" },
+                    { "column": "identificador_sistema_origem_pessoa" },
+                    { "column": "identificador_sistema_origem_pessoa_afastada" },
+                    { "column": "identificador_sistema_origem_id_lotacao" },
+                    { "column": "id_tipo_designacao" },
+                    { "column": "id_situacao_designacao" },
+                    { "column": "portaria" },
+                    { "column": "competencia_designacao" },
+                    { "column": "observacao_designacao" },
+                    { "column": "despacho_designacao" },
+                    { "column": "inicial" },
+                    { "column": "final" },
+                    { "column": "sta_prejuizo_jurisdicao" },
+                    { "column": "sta_tipo_revogacao_designacao" },
+                    { "column": "sin_titularidade_plena" },
+                    { "column": "sin_com_grat_acumulo_manual_designacao" },
+                    { "column": "num_documento_inicial_designacao" },
+                    { "column": "num_documento_final_designacao" },
+                    { "column": "id_tipo_documento_inicial_designacao" },
+                    { "column": "documento_inicial_designacao" },
+                    { "column": "publicacao_inicial_designacao" },
+                    { "column": "id_tipo_documento_final_designacao" },
+                    { "column": "documento_final_designacao" },
+                    { "column": "publicacao_final_designacao" },
+                    { "column": "email_enviado_designacao" },
+                    { "column": "id_origem_criacao_designacao" },
+                    { "column": "id_tipo_afastamento_designacao" },
+                    { "column": "nome_orgao_emissor_designacao" },
+                    { "column": "sigla_orgao_emissor_designacao" },
+                ],
+                timeline: {
+                    start: row => dateFromDDMMYYYY(row.inicial),
+                    end: row => dateFromDDMMYYYY(row.final) || new Date(),
+                    position: (row) => maiusculasEMinusculas(row.identificador_sistema_origem_id_lotacao),
+                    name: (row) => (maiusculasEMinusculas(row.observacao_designacao || '').replace(/^.*?Motivo:(.+?)\s*Data Expediente.+$/gm, '$1')),
+                    tooltips: (row) => [{ label: 'Observação', value: row.observacao_designacao }]
+                }
             }
         },
 
@@ -507,7 +554,14 @@ export default async function buildStructure() {
                     { "column": "competencia" },
                     { "column": "email_enviado" },
                     { "column": "escala" },
-                ]
+                ],
+                timeline: {
+                    start: row => dateFromDDMMYYYY(row.inicio),
+                    end: row => dateFromDDMMYYYY(row.final) || new Date(),
+                    position: (row) => 'Férias',
+                    name: (row) => `${row.periodo_aquisitivo}-${row.sta_sequencial}`,
+                    tooltips: (row) => [{ label: 'Despacho', value: row.despacho }]
+                }
             }
         },
 
@@ -537,16 +591,6 @@ export default async function buildStructure() {
         },
 
         {
-            table: 'lotacoes_final', meta: {
-                pk: ['identificador_sistema_origem'],
-                descr: 'nome',
-                fks: [{
-                    table: 'lotacoes_final', fk: 'identificador_sistema_origem_lotacao_pai'
-                }],
-            }
-        },
-
-        {
             table: 'movimentacao_magistrados_final', meta: {
                 pk: ['identificador_sistema_origem_ingresso', 'inicio'],
                 enums: [
@@ -556,7 +600,7 @@ export default async function buildStructure() {
                 ],
                 fks: [
                     { column: 'identificador_sistema_origem_ingresso', relatedTable: 'ingresso_magistrados_final', relatedColumn: 'identificador_sistema_origem_ingresso' },
-                    { column: 'identificador_sistema_origem_lotacao', relatedTable: 'lotacao_final', relatedColumn: 'identificador_sistema_origem' },
+                    // { column: 'identificador_sistema_origem_lotacao', relatedTable: 'lotacoes_final', relatedColumn: 'identificador_sistema_origem' },
                 ],
                 ui: [
                     { column: "identificador_sistema_origem_ingresso" },
@@ -571,7 +615,13 @@ export default async function buildStructure() {
                     { column: "numero_ato" },
                     { column: "data_ato" },
                     { column: "publicacao_ato" },
-                ]
+                ],
+                timeline: {
+                    start: row => dateFromDDMMYYYY(row.inicio),
+                    end: row => dateFromDDMMYYYY(row.final),
+                    position: (row) => 'Movimentacao',
+                    name: (row) => (maiusculasEMinusculas(row.identificador_sistema_origem_lotacao || '')),
+                }
             }
         },
 
@@ -617,6 +667,7 @@ export default async function buildStructure() {
     struc.forEach((s) => s.directory = s.directory || dir)
 
     return {
+        directory: dir,
         month: mes,
         year: ano,
         reviewFilename: `${process.env.CSVIEWER_DIR_DATA}/review_serh.json`,

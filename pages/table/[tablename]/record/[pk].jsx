@@ -192,6 +192,10 @@ export default function Record(props) {
           })}
         </h3></div>
         <div className="col col-auto">
+          {(props.related ? props.related.some(t => t.meta.timeline) : false) 
+            ? <Button variant="info" onClick={() => router.push(`/table/${props.tablename}/timeline/${props.pk}`)} className='me-2'>Timeline</Button> 
+            : ''
+          }
           <Button variant="success" onClick={handleApprove} hidden={status === 'success'}>Aprovar</Button>
           <Button variant="secondary" onClick={handleRemoveApprove} hidden={status !== 'success'}>Cancelar Aprovação</Button>
         </div>
