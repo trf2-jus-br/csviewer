@@ -1,9 +1,11 @@
 import { useContext } from '../../../../../utils/context'
+import { dateDiff } from '../../../../../utils/date'
 import { consultarStatus } from '../../../../../utils/rv-util'
 import Timeline from '../../../../timeline'
 import { renderToStringServer } from '../../../../../utils/text'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckToSlot } from '@fortawesome/free-solid-svg-icons'
+import Func from '../../../../../utils/func'
 
 export default async function Record({ params }) {
   // console.log(params)
@@ -72,7 +74,9 @@ export default async function Record({ params }) {
     { type: "string", id: "Name" },
     { type: "string", role: "tooltip" },
     { type: "date", id: "Start" },
-    { type: "date", id: "End" }]]
+    { type: "date", id: "End" },
+    { type: "string", role: "link" },
+  ]]
 
   if (props.related) {
     let maxDate = new Date(0, 0, 0)
@@ -96,17 +100,7 @@ export default async function Record({ params }) {
 
     // Method that computes the difference between two dates in days, months and years as a string
     // shows only the units of time that are not zero
-    const dateDiff = (start, end) => {
-      const diff = end - start
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-      const months = Math.floor(days / 30)
-      const years = Math.floor(months / 12)
-      let s = ''
-      if (years > 0) s += `${years} ano${years > 1 ? 's' : ''}`
-      if (months > 0) s += `${s ? (days > 0 ? ', ' : ' e ') : ''}${months} mês${months > 1 ? 'es' : ''}`
-      if (days > 0) s += `${s ? ' e ' : ''}${days} dia${days > 1 ? 's' : ''}`
-      return s ? s : undefined
-    }
+
 
     const tooltip = (position, name, start, end, tooltips) => {
       return renderToStringServer(
@@ -118,9 +112,9 @@ export default async function Record({ params }) {
           <div style={{ padding: '.5em .5em .5em .5em', fontWeight: 'bold' }}>
             {name}
           </div>
-          <hr c style={{ margin: '0' }} />
+          <hr style={{ margin: '0' }} />
           <div style={{ padding: '.5em .5em .5em .5em' }}>
-            <b>De:</b> {start.toLocaleDateString()} <b>a:</b> {end.toLocaleDateString()}
+            <b>De:</b> {start.toLocaleDateString('en-GB')} <b>a:</b> {end.toLocaleDateString('en-GB')}
             {dateDiff(start, end)
               ? <><br /><b>Duração:</b> {dateDiff(start, end)}</>
               : <></>}
@@ -146,7 +140,8 @@ export default async function Record({ params }) {
             const start = tl.start(d)
             const end = tl.end(d) || maxDate
             const tooltips = tl.tooltips ? tl.tooltips(d) : []
-            data.push([position, name, tooltip(position, name, start, end, tooltips), start, end]);
+            data.push([position, name, tooltip(position, name, start, end, tooltips), start, end,
+              `${props.CSVIEWER_API_URL_BROWSER}table/${r.meta.name}/record/${encodeURIComponent(Func.pk(r, d))}`]);
           })
       }
     });
