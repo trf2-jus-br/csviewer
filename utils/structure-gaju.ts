@@ -4,7 +4,7 @@ export default async function buildStructure() {
 
     let ano = '2000'
     let mes = '01'
-    const files = await fs.readdir(process.env.CSVIEWER_DIR_GAJUFOLHA);
+    const files = await fs.readdir(process.env.CSVIEWER_DIR_GAJUFOLHA || '');
 
     const regex = /^Gaju_Folha_(?<mes>\d\d)_(?<ano>20\d\d)\.csv$/;
 
@@ -90,16 +90,30 @@ export default async function buildStructure() {
         `RJ_Varas Federais de Niterói e Baixada Litorânea_São Gonçalo_Varas Federais Mistas_${month}`,
         `RJ_Varas Federais de Niterói e Baixada Litorânea_São Pedro da Aldeia_Varas Mistas_${month}`,]
 
-    const struc = csvsGajuMini.map(i => ({
-        table: i,
-        directory: ``,
-        concatenate: undefined,
-        alsoUpdate: `Gaju_Folha_${month}`,
+
+    type Structure = {
+        table: string;
+        directory: string;
+        concatenate: RegExp | undefined;
+        alsoUpdate: string;
         meta: {
-            pk: [`NOME COMPLETO`],
-            descr: `NOME COMPLETO`
-        }
-    }))
+            pk: string[];
+            descr: string;
+        };
+    };
+
+    const struc = csvsGajuMini.map((i): Structure => (
+        {
+            table: i,
+            directory: ``,
+            concatenate: undefined,
+            alsoUpdate: `Gaju_Folha_${month}`,
+            meta: {
+                pk: [`NOME COMPLETO`],
+                descr: `NOME COMPLETO`
+            }
+        })
+    )
 
     struc.push({
         table: `Gaju_Folha_${month}`,
@@ -186,7 +200,7 @@ export default async function buildStructure() {
 
     struc.push({
         table: `Substituicao_Folha_${month}`,
-        directory: process.env.CSVIEWER_DIR_DATA,
+        directory: (process.env.CSVIEWER_DIR_DATA || ''),
         concatenate: /^Substituição.*$/,
         alsoUpdate: ``,
         meta: {

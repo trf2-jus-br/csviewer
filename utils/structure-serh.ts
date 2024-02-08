@@ -4,7 +4,7 @@ import { dateFromDDMMYYYY } from './date';
 
 export default async function buildStructure() {
 
-    const files = await fs.readdir(process.env.CSVIEWER_DIR_SERH);
+    const files = await fs.readdir(process.env.CSVIEWER_DIR_SERH||'');
 
     const regex = /^(?<ano>\d{4})(?<mes>\d{2})(?<dia>\d{2})\.(?<hora>\d{2})(?<minuto>\d{2})(?<segundo>\d{2})$/
 
@@ -23,9 +23,9 @@ export default async function buildStructure() {
 
     console.log(`CSVIEWER_DIR_SERH: ${dir}`);
 
-    const m = regex.exec(mostRecent)
-    const mes = m !== null ? Number(m.groups.mes) : 1
-    const ano = m !== null ? Number(m.groups.ano) : 1900
+    const m = regex.exec(mostRecent);
+    const mes = m !== null && m.groups !== undefined ? Number(m.groups.mes) : 1;
+    const ano = m !== null && m.groups !== undefined ? Number(m.groups.ano) : 1900;
     console.log(`Data: ${mes}/${ano}`);
 
     const struc = [
