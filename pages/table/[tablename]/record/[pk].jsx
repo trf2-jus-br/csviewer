@@ -106,6 +106,7 @@ export default function Record(props) {
         pk: props.pk,
         field: selectedField.column,
         value: props.record[selectedField.column],
+        enumvalue: props.record[`_${selectedField.column}`],
         message: text,
       }, { setErrorMessage })
       // console.log(`fetched`)
@@ -192,8 +193,8 @@ export default function Record(props) {
           })}
         </h3></div>
         <div className="col col-auto">
-          {(props.related ? props.related.some(t => t.meta.timeline) : false) 
-            ? <Button variant="info" onClick={() => router.push(`/table/${props.tablename}/timeline/${props.pk}`)} className='me-2'>Timeline</Button> 
+          {(props.related ? props.related.some(t => t.meta.timeline) : false)
+            ? <Button variant="info" onClick={() => router.push(`/table/${props.tablename}/timeline/${props.pk}`)} className='me-2'>Timeline</Button>
             : ''
           }
           <Button variant="success" onClick={handleApprove} hidden={status === 'success'}>Aprovar</Button>
@@ -209,20 +210,20 @@ export default function Record(props) {
               <>
                 {h.group ? (<div className="col col-12" key={`title: ${h.column}`}><h4>{h.group}</h4></div>) : ''}
                 <Form.Group className={`mb-3 col ${h.width ? 'col-' + h.width : 'col-auto'}`} controlId={h.column} key={`column:${h.column}`}>
-                  <Form.Label className="mb-0 w-100" style={{whiteSpace: 'nowrap'}}>
+                  <Form.Label className="mb-0 w-100" style={{ whiteSpace: 'nowrap' }}>
                     <div className="rowx">
                       <span className="colx me-autox">{h.caption}
-                      {error
-                        ? (<span className="colx col-autox" style={{ color: 'red' }}><a onClick={() => handleRemoveError(h)}><FontAwesomeIcon icon={faBug} /></a></span>)
-                        : (<span className="colx col-autox" style={{ color: 'lightgray' }}><a onClick={() => openModalReportError(h)}><FontAwesomeIcon icon={faBugSlash} /></a></span>)
-                      }
+                        {error
+                          ? (<span className="colx col-autox" style={{ color: 'red' }}><a onClick={() => handleRemoveError(h)}><FontAwesomeIcon icon={faBug} /></a></span>)
+                          : (<span className="colx col-autox" style={{ color: 'lightgray' }}><a onClick={() => openModalReportError(h)}><FontAwesomeIcon icon={faBugSlash} /></a></span>)
+                        }
                       </span>
                     </div>
                   </Form.Label>
-                  <span className="form-control" style={{whiteSpace: 'nowrap'}} dangerouslySetInnerHTML={{ __html: props.record[h.column] ? props.record[h.column] : '&nbsp' }} />
+                  <span className="form-control" style={{ whiteSpace: 'nowrap' }} dangerouslySetInnerHTML={{ __html: props.record[`_${h.column}`] || props.record[h.column] || '&nbsp' }} />
                   {props.rv && props.rv.approved && props.record[h.column] !== props.rv.approved[h.column]
                     ?
-                    <><Form.Label className="mt-1 mb-0 w-100"><span className="text-warning">Valor Aprovado</span></Form.Label><span className="form-control bg-warning" dangerouslySetInnerHTML={{ __html: props.rv.approved[h.column] ? props.rv.approved[h.column] : '&nbsp' }} /></>
+                    <><Form.Label className="mt-1 mb-0 w-100"><span className="text-warning">Valor Aprovado</span></Form.Label><span className="form-control bg-warning" dangerouslySetInnerHTML={{ __html: props.rv.approved[`_${h.column}`] || props.rv.approved[h.column] || '&nbsp' }} /></>
                     : ''}
                 </Form.Group>
               </>

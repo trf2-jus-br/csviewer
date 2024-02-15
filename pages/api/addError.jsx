@@ -11,9 +11,10 @@ const handler = async function (req, res) {
     const pk = req.body.pk
     const field = req.body.field
     const value = req.body.value
+    const enumvalue = req.body.enumvalue
     const message = req.body.message
 
-    context.rv.addError(req.session, tablename, pk, field, value, message)
+    context.rv.addError(req.session, tablename, pk, field, value, enumvalue, message)
 
     res.status(200).json({ status: 'OK' });
 }

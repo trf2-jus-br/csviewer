@@ -4,7 +4,7 @@ import { dateFromDDMMYYYY } from './date';
 
 export default async function buildStructure() {
 
-    const files = await fs.readdir(process.env.CSVIEWER_DIR_SERH||'');
+    const files = await fs.readdir(process.env.CSVIEWER_DIR_SERH || '');
 
     const regex = /^(?<ano>\d{4})(?<mes>\d{2})(?<dia>\d{2})\.(?<hora>\d{2})(?<minuto>\d{2})(?<segundo>\d{2})$/
 
@@ -85,9 +85,9 @@ export default async function buildStructure() {
             table: 'lotacoes_final', meta: {
                 pk: ['identificador_sistema_origem'],
                 descr: 'nome',
-                fks: [{
-                    table: 'lotacoes_final', fk: 'identificador_sistema_origem_lotacao_pai'
-                }],
+                // fks: [
+                //     { column: 'identificador_sistema_origem_pessoa', relatedTable: 'ingresso_magistrados_final', relatedColumn: 'identificador_sistema_origem_pessoa' }
+                // ],
                 ui: [
                     { "column": "identificador_sistema_origem" },
                     { "column": "identificador_sistema_origem_lotacao_pai" },
@@ -107,7 +107,11 @@ export default async function buildStructure() {
                     { "column": "identificador_sistema_origem_informacao_lotacao" },
                     { "column": "codigo_ibge_cidade" },
                     { "column": "sta_restricao_vaga" },
-                    { "column": "sta_tipo_judicial_unidade" }]
+                    { "column": "sta_tipo_judicial_unidade" }],
+                related: [
+                    'movimentacao_magistrados_final',
+                    'designacao_magistrados_final',
+                ],
             }
         },
 
@@ -136,9 +140,6 @@ export default async function buildStructure() {
                     { key: 'id_tipo_pessoa', table: 'Tabela-Básica-TIPO-PESSOA' },
                     { key: 'id_tipo_sanguineo_pessoa', table: 'Tabela-Básica-TIPO-SANGUÍNEO' },
                 ],
-                fks: [{
-                    table: 'orgaos_final', fk: 'identificador_sistema_origem_orgao'
-                }],
                 related: [
                     'movimentacao_magistrados_final',
                     'designacao_magistrados_final',
@@ -316,7 +317,7 @@ export default async function buildStructure() {
                     start: row => dateFromDDMMYYYY(row.inicio),
                     end: row => dateFromDDMMYYYY(row.final) || new Date(),
                     position: (row) => 'Afastamentos',
-                    name: (row) => (maiusculasEMinusculas(row.id_tipo_afastamento_afastamento || '')),
+                    name: (row) => (maiusculasEMinusculas(row._id_tipo_afastamento_afastamento || '')),
                 }
             }
         },
@@ -443,7 +444,7 @@ export default async function buildStructure() {
                 timeline: {
                     start: row => dateFromDDMMYYYY(row.inicial),
                     end: row => dateFromDDMMYYYY(row.final) || new Date(),
-                    position: (row) => maiusculasEMinusculas(row.identificador_sistema_origem_id_lotacao),
+                    position: (row) => maiusculasEMinusculas(row._identificador_sistema_origem_id_lotacao),
                     name: (row) => (maiusculasEMinusculas(row.observacao_designacao || '').replace(/^.*?Motivo:(.+?)\s*Data Expediente.+$/gm, '$1')),
                     tooltips: (row) => [{ label: 'Observação', value: row.observacao_designacao }]
                 }
@@ -600,7 +601,7 @@ export default async function buildStructure() {
                 ],
                 fks: [
                     { column: 'identificador_sistema_origem_ingresso', relatedTable: 'ingresso_magistrados_final', relatedColumn: 'identificador_sistema_origem_ingresso' },
-                    // { column: 'identificador_sistema_origem_lotacao', relatedTable: 'lotacoes_final', relatedColumn: 'identificador_sistema_origem' },
+                    { column: 'identificador_sistema_origem_lotacao', relatedTable: 'lotacoes_final', relatedColumn: 'identificador_sistema_origem' },
                 ],
                 ui: [
                     { column: "identificador_sistema_origem_ingresso" },
@@ -620,7 +621,7 @@ export default async function buildStructure() {
                     start: row => dateFromDDMMYYYY(row.inicio),
                     end: row => dateFromDDMMYYYY(row.final),
                     position: (row) => 'Movimentacao',
-                    name: (row) => (maiusculasEMinusculas(row.identificador_sistema_origem_lotacao || '')),
+                    name: (row) => (maiusculasEMinusculas(row._identificador_sistema_origem_lotacao || '')),
                 }
             }
         },

@@ -9,10 +9,20 @@ export function temErro(review) {
     return error
 }
 
+export function removeValoresDeEnums(record) {
+    if (!record) return undefined
+    const recordWithoutEnums = Object.keys(record).reduce(function (obj, k) {
+        if (!k.startsWith('_')) obj[k] = record[k]
+        return obj
+    }, {})
+    return recordWithoutEnums
+}
+
 export function temAlteracao(review, record) {
     const approved = temAprovacao(review)
     if (!approved) return undefined
-    const altered = JSON.stringify(approved) !== JSON.stringify(record)
+
+    const altered = JSON.stringify(removeValoresDeEnums(approved)) !== JSON.stringify(removeValoresDeEnums(record))
     if (altered) {
         // console.log('ALTERED')
         // console.log(JSON.stringify(record))

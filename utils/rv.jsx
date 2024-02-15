@@ -110,17 +110,17 @@ const RV = class RV {
         if (!reflected) await this.gravar()
     }
 
-    async addError(session, tablename, pk, field, value, message, reflected) {
-        console.log(`addError(${tablename}, ${pk}, ${field}, ${value}, ${message}, ${reflected})`)
+    async addError(session, tablename, pk, field, value, enumvalue, message, reflected) {
+        console.log(`addError(${tablename}, ${pk}, ${field}, ${value}, ${enumvalue}, ${message}, ${reflected})`)
         this.inicializarErro(tablename, pk, field)
         this.data[tablename][pk].error[field] = { value: value, message: message }
         if (this.data[tablename][pk].approved)
             delete this.data[tablename][pk].approved
-        this.addEvent(session, tablename, pk, 'Registro de Erro' + (reflected ? ' (refletido)' : ''), `${field}: '${value}' - ${message}`)
+        this.addEvent(session, tablename, pk, 'Registro de Erro' + (reflected ? ' (refletido)' : ''), `${field}: '${value}'${enumvalue ? ' (' + enumvalue + ')' : ''} - ${message}`)
 
         const tableStructure = this.structure.tables.find(i => i.table === tablename)
         if (tableStructure && tableStructure.alsoUpdate)
-            await this.addError(session, tableStructure.alsoUpdate, removeAccents(pk), field, value, message, true)
+            await this.addError(session, tableStructure.alsoUpdate, removeAccents(pk), field, value, enumvalue, message, true)
         if (!reflected) await this.gravar()
     }
 

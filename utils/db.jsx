@@ -166,10 +166,10 @@ const DB = class DB {
                             if (!enumTable.index[from]) {
                                 console.log(`Enum index não ${enumTable.index} não contém: ${from}`)
                             }
-                            row[enm.key] = enumTable.index[from][enumTable.meta.descr]
+                            row[`_${enm.key}`] = enumTable.index[from][enumTable.meta.descr]
                         } else if (enm.values) {
                             // console.log(enm.values)
-                            row[enm.key] = enm.values[from]
+                            row[`_${enm.key}`] = enm.values[from]
                         }
                     })
                 }
