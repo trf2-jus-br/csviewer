@@ -159,14 +159,23 @@ const DB = class DB {
 
                 if (meta.enums) {
                     meta.enums.forEach(enm => {
-                        const from = row[enm.key]
+                        let from = row[enm.key]
+                        if (enm.buildFk) from = enm.buildFk(row)
                         if (!from) return
                         if (enm.table) {
                             const enumTable = this.tables[enm.table]
                             if (!enumTable.index[from]) {
                                 console.log(`Enum index não ${enumTable.index} não contém: ${from}`)
                             }
-                            row[`_${enm.key}`] = enumTable.index[from][enumTable.meta.descr]
+                            const enumTableRow =enumTable.index[from]
+                            if (!enumTableRow) {
+                                console.log(`Enum index não ${enumTable.index} não contém: ${from}`)
+                            }
+                            try {
+                                row[`_${enm.key}`] = enumTableRow[enumTable.meta.descr]
+                            } catch (error) {
+                                console.log(`Enum ${enm.table} não contém a coluna ${enumTable.meta.descr}`)
+                            }
                         } else if (enm.values) {
                             // console.log(enm.values)
                             row[`_${enm.key}`] = enm.values[from]

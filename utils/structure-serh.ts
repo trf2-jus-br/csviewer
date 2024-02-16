@@ -1,6 +1,7 @@
 import fs from 'fs/promises'
 import { maiusculasEMinusculas } from './text';
 import { dateFromDDMMYYYY } from './date';
+import { useContext } from './context'
 
 export default async function buildStructure() {
 
@@ -27,6 +28,18 @@ export default async function buildStructure() {
     const mes = m !== null && m.groups !== undefined ? Number(m.groups.mes) : 1;
     const ano = m !== null && m.groups !== undefined ? Number(m.groups.ano) : 1900;
     console.log(`Data: ${mes}/${ano}`);
+
+    const obterNomeDoMagistrado = (context, idIngresso, idPessoa) => {
+        const ingressos = context.db.tables['ingresso_magistrados_final'].data
+        let ingresso = ingressos.find(row => row.identificador_sistema_origem_ingresso === idIngresso)
+        if (!ingresso) {
+            ingresso = ingressos.find(row => row.identificador_sistema_origem_pessoa === idPessoa)
+        }
+        if (ingresso) {
+            return maiusculasEMinusculas(ingresso.nome_pessoa)
+        }
+        return idPessoa
+    }
 
     const struc = [
         { directory: process.env.CSVIEWER_DIR_TABELAS_BASICAS_SERH, table: 'Tabela Básica - ÓRGÃO TIPO', meta: { pk: ['id_orgao_tipo'], descr: 'nome' } },
@@ -108,6 +121,24 @@ export default async function buildStructure() {
                     { "column": "codigo_ibge_cidade" },
                     { "column": "sta_restricao_vaga" },
                     { "column": "sta_tipo_judicial_unidade" }],
+                timeline: [
+                    {
+                        table: 'movimentacao_magistrados_final',
+                        start: row => dateFromDDMMYYYY(row.inicio),
+                        end: row => dateFromDDMMYYYY(row.final),
+                        position: (row) => (maiusculasEMinusculas(row._identificador_sistema_origem_ingresso || '')),
+                        name: (row) => (row._id_natureza_movimentacao || ''),
+                    },
+                    {
+                        table: 'designacao_magistrados_final',
+                        start: row => dateFromDDMMYYYY(row.inicial),
+                        end: row => dateFromDDMMYYYY(row.final) || new Date(),
+                        // position: (row) => maiusculasEMinusculas(row._identificador_sistema_origem_designacao),
+                        position: (row, context) => obterNomeDoMagistrado(context, row.identificador_sistema_origem_designacao.split('.')[0], row.identificador_sistema_origem_pessoa),
+                        name: (row) => (maiusculasEMinusculas(row.observacao_designacao || '').replace(/^.*?Motivo:(.+?)\s*Data Expediente.+$/gm, '$1')),
+                        tooltips: (row) => [{ label: 'Observação', value: row.observacao_designacao }]
+                    }
+                ],
                 related: [
                     'movimentacao_magistrados_final',
                     'designacao_magistrados_final',
@@ -155,6 +186,38 @@ export default async function buildStructure() {
 
                     // 'concessoes_magistrados_final',
                     // 'desligamento_magistrados_final',
+                ],
+                timeline: [
+                    {
+                        table: 'movimentacao_magistrados_final',
+                        start: row => dateFromDDMMYYYY(row.inicio),
+                        end: row => dateFromDDMMYYYY(row.final),
+                        position: (row) => 'Movimentacao',
+                        name: (row) => (maiusculasEMinusculas(row._identificador_sistema_origem_lotacao || '')),
+                    },
+                    {
+                        table: 'afastamentos_magistrados_final',
+                        start: row => dateFromDDMMYYYY(row.inicio),
+                        end: row => dateFromDDMMYYYY(row.final) || new Date(),
+                        position: (row) => 'Afastamentos',
+                        name: (row) => (maiusculasEMinusculas(row._id_tipo_afastamento_afastamento || '')),
+                    },
+                    {
+                        table: 'ferias_magistrados_final',
+                        start: row => dateFromDDMMYYYY(row.inicio),
+                        end: row => dateFromDDMMYYYY(row.final) || new Date(),
+                        position: (row) => 'Férias',
+                        name: (row) => `${row.periodo_aquisitivo}-${row.sta_sequencial}`,
+                        tooltips: (row) => [{ label: 'Despacho', value: row.despacho }]
+                    },
+                    {
+                        table: 'designacao_magistrados_final',
+                        start: row => dateFromDDMMYYYY(row.inicial),
+                        end: row => dateFromDDMMYYYY(row.final) || new Date(),
+                        position: (row) => maiusculasEMinusculas(row._identificador_sistema_origem_id_lotacao),
+                        name: (row) => (maiusculasEMinusculas(row.observacao_designacao || '').replace(/^.*?Motivo:(.+?)\s*Data Expediente.+$/gm, '$1')),
+                        tooltips: (row) => [{ label: 'Observação', value: row.observacao_designacao }]
+                    }
                 ],
                 ui: [
                     { column: "identificador_sistema_origem_ingresso" },
@@ -313,12 +376,6 @@ export default async function buildStructure() {
                     { column: "id_origem_criacao_afastamento" },
                     { column: "identificador_sistema_origem_pessoa" },
                 ],
-                timeline: {
-                    start: row => dateFromDDMMYYYY(row.inicio),
-                    end: row => dateFromDDMMYYYY(row.final) || new Date(),
-                    position: (row) => 'Afastamentos',
-                    name: (row) => (maiusculasEMinusculas(row._id_tipo_afastamento_afastamento || '')),
-                }
             }
         },
 
@@ -404,6 +461,10 @@ export default async function buildStructure() {
                     { key: 'id_tipo_afastamento_designacao', table: 'Tabela Básica - TIPO AFASTAMENTO' },
                     { key: 'id_origem_criacao_designacao', table: 'Tabela Básica - ORIGEM CRIAÇÃO' },
                     { key: 'identificador_sistema_origem_id_lotacao', table: 'lotacoes_final' },
+                    {
+                        key: 'identificador_sistema_origem_designacao', table: 'ingresso_magistrados_final',
+                        buildFk: (row) => row.identificador_sistema_origem_designacao.split('.')[0]
+                    },
                     //{ key: 'identificador_sistema_origem_pessoa_afastada', table: 'Tabela Básica - TIPO SALDO DIAS MAGISTRADOS' },
                 ],
                 fks: [
@@ -441,13 +502,6 @@ export default async function buildStructure() {
                     { "column": "nome_orgao_emissor_designacao" },
                     { "column": "sigla_orgao_emissor_designacao" },
                 ],
-                timeline: {
-                    start: row => dateFromDDMMYYYY(row.inicial),
-                    end: row => dateFromDDMMYYYY(row.final) || new Date(),
-                    position: (row) => maiusculasEMinusculas(row._identificador_sistema_origem_id_lotacao),
-                    name: (row) => (maiusculasEMinusculas(row.observacao_designacao || '').replace(/^.*?Motivo:(.+?)\s*Data Expediente.+$/gm, '$1')),
-                    tooltips: (row) => [{ label: 'Observação', value: row.observacao_designacao }]
-                }
             }
         },
 
@@ -556,13 +610,6 @@ export default async function buildStructure() {
                     { "column": "email_enviado" },
                     { "column": "escala" },
                 ],
-                timeline: {
-                    start: row => dateFromDDMMYYYY(row.inicio),
-                    end: row => dateFromDDMMYYYY(row.final) || new Date(),
-                    position: (row) => 'Férias',
-                    name: (row) => `${row.periodo_aquisitivo}-${row.sta_sequencial}`,
-                    tooltips: (row) => [{ label: 'Despacho', value: row.despacho }]
-                }
             }
         },
 
@@ -597,6 +644,7 @@ export default async function buildStructure() {
                 enums: [
                     { key: 'identificador_sistema_origem_lotacao', table: 'lotacoes_final' },
                     { key: 'id_natureza_movimentacao', table: 'Tabela Básica - NATUREZA MOVIMENTAÇÃO' },
+                    { key: 'identificador_sistema_origem_ingresso', table: 'ingresso_magistrados_final' },
 
                 ],
                 fks: [
@@ -617,12 +665,6 @@ export default async function buildStructure() {
                     { column: "data_ato" },
                     { column: "publicacao_ato" },
                 ],
-                timeline: {
-                    start: row => dateFromDDMMYYYY(row.inicio),
-                    end: row => dateFromDDMMYYYY(row.final),
-                    position: (row) => 'Movimentacao',
-                    name: (row) => (maiusculasEMinusculas(row._identificador_sistema_origem_lotacao || '')),
-                }
             }
         },
 

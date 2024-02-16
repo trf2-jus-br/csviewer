@@ -19,7 +19,7 @@ export default function DbTable(dbtable, review) {
 
     const columns = dbtable.meta.ui.filter(c => c.column).map((c, idx) => {
         const col = {
-            accessorKey: c.column,
+            accessorFn: (originalRow, index) => originalRow[`_${c.column}`] || originalRow[c.column],
             header: c.caption,
             enableSorting: true,
         }

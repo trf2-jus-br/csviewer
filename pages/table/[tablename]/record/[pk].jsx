@@ -193,7 +193,7 @@ export default function Record(props) {
           })}
         </h3></div>
         <div className="col col-auto">
-          {(props.related ? props.related.some(t => t.meta.timeline) : false)
+          {(props.tablemeta.timeline)
             ? <Button variant="info" onClick={() => router.push(`/table/${props.tablename}/timeline/${props.pk}`)} className='me-2'>Timeline</Button>
             : ''
           }

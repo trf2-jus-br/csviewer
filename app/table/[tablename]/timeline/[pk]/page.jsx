@@ -28,13 +28,10 @@ export default async function Record({ params }) {
     props.rv = context.rv.consultarPorPK(props.tablename, props.pk)
 
     // Add related table information
-    if (table.meta.related) {
-      const related = [...table.meta.related]
-      const removed = related.splice(related.indexOf('designacao_magistrados_final'), 1)
-      if (removed.length > 0) related.push(removed[0])
+    if (table.meta.timeline) {
       // console.log(related)
-      related.forEach(r => {
-        let rtable = context.db.tables[r]
+      table.meta.timeline.forEach(tl => {
+        let rtable = context.db.tables[tl.table]
         if (!rtable) {
           rtable = { meta: { name: '', headers: [], fks: [] }, data: [] }
         } else {
@@ -58,7 +55,7 @@ export default async function Record({ params }) {
           })
 
           props.related.push({
-            meta: rtable.meta, data: filtered, review: context.rv.data[rtable.meta.name]
+            meta: rtable.meta, data: filtered, review: context.rv.data[rtable.meta.name], timeline: tl
           })
         }
       })
@@ -83,15 +80,13 @@ export default async function Record({ params }) {
 
     // Find the max date
     props.related.forEach(r => {
-      if (r.meta.timeline) {
-        const tl = r.meta.timeline;
-        r.data
-          .filter(d => tl.start(d))
-          .forEach(d => {
-            if (tl.start(d) && tl.start(d) > maxDate) maxDate = tl.start(d)
-            if (tl.end(d) && tl.end(d) > maxDate) maxDate = tl.end(d)
-          })
-      }
+      const tl = r.timeline;
+      r.data
+        .filter(d => tl.start(d))
+        .forEach(d => {
+          if (tl.start(d) && tl.start(d) > maxDate) maxDate = tl.start(d)
+          if (tl.end(d) && tl.end(d) > maxDate) maxDate = tl.end(d)
+        })
     });
 
     const tooltip2 = (position, name, start, end, d) => {
@@ -129,14 +124,14 @@ export default async function Record({ params }) {
     }
 
     props.related.forEach(r => {
-      if (r.meta.timeline) {
-        const tl = r.meta.timeline;
+      if (r.timeline) {
+        const tl = r.timeline;
         r.data
           .filter(d => tl.start(d))
           .sort((a, b) => (tl.end(b) || maxDate) - (tl.end(a) || maxDate))
           .forEach(d => {
-            const position = tl.position(d)
-            const name = tl.name(d)
+            const position = tl.position(d, context)
+            const name = tl.name(d, context)
             const start = tl.start(d)
             const end = tl.end(d) || maxDate
             const tooltips = tl.tooltips ? tl.tooltips(d) : []
