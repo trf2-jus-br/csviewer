@@ -26,7 +26,7 @@ export default function DbTable(dbtable, review) {
             enableSorting: true,
         }
         if (dbtable.meta.pk.includes(c.column))
-            col.cell = data => <a href={`/table/${dbtable.meta.name}/record/${encodeURIComponent(Func.pk(dbtable, data.row.original))}`}>{data.getValue()}</a>
+            col.cell = data => <a href={`/table/${dbtable.meta.name}/record/${encodeURIComponent(Func.pk(dbtable, data.row.original).replace(/\//g, '$'))}`}>{data.getValue()}</a>
         return col
     })
 

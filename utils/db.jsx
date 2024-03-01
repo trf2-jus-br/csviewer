@@ -102,27 +102,27 @@ const DB = class DB {
     }
 
     protegerDadosPessoais(row) {
-        const sensiveis = [
-            'bairro_pessoa',
-            'complemento_logradouro_pessoa',
-            'cep_pessoa',
-            'email_pessoal_pessoa',
-            // 'id_cor_raca_pessoa',
-            'id_municipio_endereco_pessoa',
-            'id_pais_endereco_pessoa',
-            // 'id_tipo_logradouro_pessoa',
-            // 'id_tipo_sanguineo_pessoa',
-            'logradouro_pessoa',
-            'dta_nascimento_pessoa',
-            'nome_mae_pessoa',
-            'nome_pai_pessoa',
-            'numero_logradouro_pessoa',
-            'celular_pessoa',
-            'telefone_pessoa',
-            'nome_conjuge_pessoa'
-        ]
+        // const sensiveis = [
+        //     'bairro_pessoa',
+        //     'complemento_logradouro_pessoa',
+        //     'cep_pessoa',
+        //     'email_pessoal_pessoa',
+        //     // 'id_cor_raca_pessoa',
+        //     'id_municipio_endereco_pessoa',
+        //     'id_pais_endereco_pessoa',
+        //     // 'id_tipo_logradouro_pessoa',
+        //     // 'id_tipo_sanguineo_pessoa',
+        //     'logradouro_pessoa',
+        //     'dta_nascimento_pessoa',
+        //     'nome_mae_pessoa',
+        //     'nome_pai_pessoa',
+        //     'numero_logradouro_pessoa',
+        //     'celular_pessoa',
+        //     'telefone_pessoa',
+        //     'nome_conjuge_pessoa'
+        // ]
 
-        sensiveis.forEach(s => { if (row[s]) row[s] = row[s].replace(/[^ ]/g, '*') })
+        // sensiveis.forEach(s => { if (row[s]) row[s] = row[s].replace(/[^ ]/g, '*') })
     }
 
     record(tableName, pk) {

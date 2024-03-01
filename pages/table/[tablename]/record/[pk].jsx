@@ -38,6 +38,10 @@ export async function getServerSideProps({ req, res, params }) {
     related: []
   }
 
+  if (params.pk) params.pk = params.pk.replace(/\$/g, '/')
+
+  console.log(params.pk)
+
   if (context.db.tables[params.tablename]) {
     const table = context.db.tables[params.tablename]
     props.tablemeta = table.meta
