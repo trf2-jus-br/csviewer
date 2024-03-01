@@ -17,6 +17,8 @@ import { Table as BTable, Pagination, Form } from 'react-bootstrap'
 
 export default function DbTable(dbtable, review) {
 
+    if (!dbtable) return null
+
     const columns = dbtable.meta.ui.filter(c => c.column).map((c, idx) => {
         const col = {
             accessorFn: (originalRow, index) => originalRow[`_${c.column}`] || originalRow[c.column],
@@ -44,6 +46,19 @@ export default function DbTable(dbtable, review) {
     })
 
     // console.log(columns)
+
+    if (!dbtable.meta.exists) {
+        return (
+            <>
+                <div className="row" key={`table header: ${dbtable.meta.name}`}>
+                    <div className="col"><h3>{humanize(dbtable.meta.name)}</h3></div>
+                </div>
+                <div className="alert alert-danger" role="alert">
+                    <h4 className="alert-heading">Tabela não encontrada</h4>
+                </div>
+            </>
+        )
+    }
 
     return (
         <>
